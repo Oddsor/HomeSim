@@ -9,7 +9,7 @@ package no.oddsor.simulator2.db_tables;
  * @author Odd
  */
 public class Needs {
-    private final double maxValue = 100.0;
+    private final double maxValue = 1.0;
     private final String name;
     private double currentValue;
     

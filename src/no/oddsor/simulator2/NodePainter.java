@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import javax.swing.JPanel;
-import javax.swing.JWindow;
 import no.oddsor.simulator2.db_tables.Edge;
 import no.oddsor.simulator2.db_tables.Node;
 
@@ -129,6 +129,7 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
             yDragged = arg0.getY();
             repaint();
         }
+        simFrame.setMouseLocation(new Point(arg0.getX(), arg0.getY()));
     }
 
     @Override

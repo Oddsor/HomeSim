@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -33,6 +34,8 @@ public class MainFrame extends JFrame{
     
     private DesignFrame designer;
     
+    public HashMap<Integer, Object> options;
+    
     public MainFrame(){
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("PersonSimulator");
@@ -51,7 +54,7 @@ public class MainFrame extends JFrame{
             db.open();
             painter = new SimulationDisplay(new Simulation(true, dbHandler), 
                     "appsketch.jpg", new Point(), db);
-            designer = new DesignFrame(db);
+            designer = new DesignFrame(this, db);
         }catch(Exception e){
             
         }
@@ -72,6 +75,8 @@ public class MainFrame extends JFrame{
         needsPanel.setMaximumSize(needsPanel.getPreferredSize());
         menubox.add(needsPanel);
         menubox.add(new JPanel());
+        Box bottomButtonBox = Box.createHorizontalBox();
+        menubox.add(bottomButtonBox);
         
         JButton editButton = new JButton("Open editor");
         editButton.addActionListener(new ActionListener() {
@@ -81,7 +86,8 @@ public class MainFrame extends JFrame{
                 designer.setVisible(true);
             }
         });
-        menubox.add(editButton);
+        bottomButtonBox.add(new JButton("Start sim"));
+        bottomButtonBox.add(editButton);
         box.add(painter);
         box.add(menubox);
         add(box);

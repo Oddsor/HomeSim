@@ -5,8 +5,14 @@
 package no.oddsor.simulator2;
 
 import com.almworks.sqlite4java.SQLiteConnection;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.Box;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import no.oddsor.simulator2.db_tables.Node;
 
@@ -14,12 +20,19 @@ import no.oddsor.simulator2.db_tables.Node;
  *
  * @author Odd
  */
-public class DesignFrame extends JFrame{
+public class DesignFrame extends JFrame implements ActionListener{
     private DatabaseHandler dbHandler;
     private SQLiteConnection db;
     private NodePainter painter;
+    private JLabel mouseLocation;
+    private JPanel nodePanel;
+    private MainFrame mainFrame;
     
-    public DesignFrame(SQLiteConnection db){
+    private JCheckBox isStart;
+    private Node selectedNode;
+    
+    public DesignFrame(MainFrame frame, SQLiteConnection db){
+        this.mainFrame = frame;
         this.db = db;
         setTitle("Editor");
         try{
@@ -31,6 +44,13 @@ public class DesignFrame extends JFrame{
         
         Box horizontal = Box.createHorizontalBox();
         Box menuBox = Box.createVerticalBox();
+        
+        mouseLocation = new JLabel("");
+        nodePanel = new JPanel();
+        menuBox.add(nodePanel);
+        menuBox.add(mouseLocation);
+        
+        
         horizontal.add(menuBox);
         horizontal.add(painter);
         add(horizontal);
@@ -38,6 +58,27 @@ public class DesignFrame extends JFrame{
     }
 
     void setActiveNode(Node selectedPoint) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        nodePanel = new JPanel();
+        isStart = new JCheckBox("Starting point");
+        isStart.addActionListener(this);
+        Node start = (Node) mainFrame.options.get(BaseOptions.startLocation);
+        if(selectedPoint.id == start.id){
+            isStart.setSelected(true);
+            isStart.setEnabled(false);
+        }
+        selectedNode = selectedPoint;
+        nodePanel.add(isStart);
+    }
+    
+    void setMouseLocation(Point location){
+        mouseLocation.setText(location.x + ", " + location.y);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        if(ae.getSource().equals(isStart)){
+            mainFrame.options.remove(BaseOptions.startLocation);
+            mainFrame.options.put(BaseOptions.startLocation, selectedNode);
+        }
     }
 }

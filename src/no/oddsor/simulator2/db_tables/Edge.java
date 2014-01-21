@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package no.oddsor.simulator2.db_tables;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteStatement;
 import java.awt.Point;
 import java.util.ArrayList;
-import no.oddsor.simulator2.DatabaseHandler;
 
 /**
  *
@@ -35,6 +31,15 @@ public class Edge {
             return edges;
         }
     }
+
+    public static void createTable(SQLiteConnection db){
+        try {
+            db.exec("CREATE TABLE IF NOT EXISTS edge (" +
+" id INTEGER PRIMARY KEY, idnodea INT, idnodeb INT);");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
     
     public int id;
     public Node a, b;
@@ -54,15 +59,6 @@ public class Edge {
         return cachedLength;
     }
 
-    public static void createTable(SQLiteConnection db){
-        try {
-            db.exec("CREATE TABLE IF NOT EXISTS edge (" +
-" id INTEGER PRIMARY KEY, idnodea INT, idnodeb INT);");
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-    
     public void insertEdge(SQLiteConnection db){
         try{
             if(id == -1) db.exec("INSERT INTO edge VALUES(null, " + a.id + ", " + b.id + ");");
@@ -91,8 +87,8 @@ public class Edge {
         }
         return result;
     }
-
-    public void update(SQLiteConnection db) {
+    
+    public void update(SQLiteConnection db){
         try {
             if(id == -1){
                 db.exec("INSERT INTO edge VALUES(null, " + a.id + ", " + b.id + ");");

@@ -8,7 +8,6 @@ import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteStatement;
 import java.awt.Point;
 import java.util.ArrayList;
-import no.oddsor.simulator2.DatabaseHandler;
 
 /**
  *
@@ -43,6 +42,16 @@ public class Node extends Point{
         return null;
     }
     
+    
+    public static void createTable(SQLiteConnection db){
+        try {
+            db.exec("CREATE TABLE IF NOT EXISTS node (" +
+" id INTEGER PRIMARY KEY, x INT, y INT);");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    
     public int id;
     
     public Node(int id, int x, int y){
@@ -52,16 +61,7 @@ public class Node extends Point{
     }
     
     
-public static void createTable(SQLiteConnection db){
-        try {
-            db.exec("CREATE TABLE IF NOT EXISTS node (" +
-" id INTEGER PRIMARY KEY, x INT, y INT);");
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public void update(SQLiteConnection db) {
+    public void update(SQLiteConnection db){
         try {
             if(id == -1){
                 db.exec("INSERT INTO node VALUES(null, " + x + ", " + y + ");");
@@ -76,8 +76,8 @@ public static void createTable(SQLiteConnection db){
             e.printStackTrace();
         }
     }
-    
-    public void remove(SQLiteConnection db){
+
+    public void remove(SQLiteConnection db) {
         try{
             db.exec("DELETE FROM node WHERE id=" + id);
         }catch(Exception e){
