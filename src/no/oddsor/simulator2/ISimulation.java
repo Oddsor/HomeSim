@@ -15,14 +15,14 @@ import no.oddsor.simulator2.db_tables.Node;
  *
  * @author Odd
  */
-public interface ISimulation {
+abstract class ISimulation {
     /**
      * @param person The person whose location we're moving from
      * @param maxMovement Maximum movement speed in pixels
      * @param target Node we're moving towards
      * @return 
      */
-    public Point getNextLocation(Person person, Node target, int maxMovement);
+    abstract Point getNextLocation(Person person, Node target, int maxMovement);
     
     /**
      * 
@@ -30,7 +30,7 @@ public interface ISimulation {
      * @param tasks Tasks we can choose from
      * @return 
      */
-    public Task getNextTask(Person person, ArrayList<Task> tasks);
+    abstract Task getNextTask(Person person, ArrayList<Task> tasks);
     
     /**
      * By doing things like starting a washing machine, we will eventually have clean
@@ -39,6 +39,6 @@ public interface ISimulation {
      * @param upcomingVariables
      * @return 
      */
-    public ArrayList<Task> filterTasks(ArrayList<Task> tasks, 
+    abstract ArrayList<Task> filterTasks(ArrayList<Task> tasks, 
             HashMap<Variable, Integer> upcomingVariables);
 }

@@ -5,8 +5,6 @@ import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -18,7 +16,7 @@ abstract class AbstractTable implements DatabaseTable{
     private static final String DOUBLE = "DOUBLE";
     private static final String STRING = "STRING";
     
-    private SQLiteConnection db;
+    private final SQLiteConnection db;
     private int id;
     
     public AbstractTable(SQLiteConnection db, int id) throws SQLiteException{
@@ -29,7 +27,7 @@ abstract class AbstractTable implements DatabaseTable{
     
     public static void createSimpleTable(String tableName, Map<String, String> columns, 
             boolean ifNotExists, SQLiteConnection dbConn) throws SQLiteException {
-        String sql = "CREATE TABLE " + (ifNotExists ? "IF NOT EXISTS ": "") + tableName + " (";
+        String sql = "CREATE TABLE " + (ifNotExists ? "IF NOT EXISTS ": "") + tableName + "(";
         sql += ("id INTEGER PRIMARY KEY, ");
         Iterator it = columns.keySet().iterator();
         while(it.hasNext()){
