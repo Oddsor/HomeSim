@@ -1,6 +1,7 @@
 
-package no.oddsor.simulator2.db_tables;
+package no.oddsor.simulator3;
 
+import no.oddsor.simulator2.db_tables.*;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import java.util.Iterator;
@@ -10,23 +11,28 @@ import java.util.Map;
  *
  * @author Odd
  */
-abstract class AbstractTable implements DatabaseTable{
+abstract class AbstractTable{
     
     private static final String INTEGER = "INTEGER";
     private static final String DOUBLE = "DOUBLE";
     private static final String STRING = "STRING";
     
-    private final SQLiteConnection db;
-    private int id;
-    private String tableName;
+    SQLiteConnection db;
+    int id;
     
-    public AbstractTable(SQLiteConnection db, int id) throws SQLiteException{
+    private String tableName;
+    private Map<String, String> columns;
+    
+    public AbstractTable(SQLiteConnection db, int id, String tableName, 
+            Map<String, String> columns) throws SQLiteException{
         if(!db.isOpen()) db.open();
         this.db = db;
         this.id = id;
+        this.tableName = tableName;
+        this.columns = columns;
     }
     
-    public static void createSimpleTable(String tableName, Map<String, String> columns, 
+    private static void createSimpleTable(String tableName, Map<String, String> columns, 
             boolean ifNotExists, SQLiteConnection dbConn) throws SQLiteException {
         String sql = "CREATE TABLE " + (ifNotExists ? "IF NOT EXISTS ": "") + tableName + "(";
         sql += ("id INTEGER PRIMARY KEY, ");

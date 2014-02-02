@@ -1,12 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package no.oddsor.simulator2;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 import no.oddsor.simulator2.db_tables.Node;
+import no.oddsor.simulator2.db_tables.Options;
 
 /**
  *
@@ -26,21 +25,23 @@ class Simulation {
     
     private DatabaseHandler dbHandler;
     
-    private HashMap<String, Object> options;
+    private HashMap<Integer, Object> options;
+    private ArrayList<Person> people;
 
-    public HashMap<String, Object> getOptions() {
+    public HashMap<Integer, Object> getOptions() {
         return options;
     }
 
-    public void setOptions(HashMap<String, Object> options) {
+    public void setOptions(HashMap<Integer, Object> options) {
         this.options = options;
     }
     
+    //TODO implement some sort of resume-feature (if restart false)
     public Simulation(boolean restart, DatabaseHandler dbHandler){
         this.dbHandler = dbHandler;
-        if(restart){
-            
-        }
+        this.people = Person.getPeople((Point) options.get(Options.START_LOCATION));
+        
+        //TODO what do we need to start a sim?! The map, the points belonging to map
     }
     
     public Point getNextPosition(){
