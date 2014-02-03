@@ -4,6 +4,7 @@
  */
 package no.oddsor.simulator2;
 
+import no.oddsor.simulator2.db_tables.Options;
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -61,7 +62,10 @@ public class DesignFrame extends JFrame implements ActionListener{
         nodePanel = new JPanel();
         isStart = new JCheckBox("Starting point");
         isStart.addActionListener(this);
-        Node start = (Node) mainFrame.options.get(BaseOptions.startLocation);
+        Node start = (Node) mainFrame.options.get(Options.START_LOCATION);
+        
+        
+        
         if(selectedPoint.id == start.id){
             isStart.setSelected(true);
             isStart.setEnabled(false);
@@ -77,8 +81,8 @@ public class DesignFrame extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent ae) {
         if(ae.getSource().equals(isStart)){
-            mainFrame.options.remove(BaseOptions.startLocation);
-            mainFrame.options.put(BaseOptions.startLocation, selectedNode);
+            mainFrame.options.remove(Options.START_LOCATION);
+            mainFrame.options.put(Options.START_LOCATION, selectedNode);
         }
     }
 }
