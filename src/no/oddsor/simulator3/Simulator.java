@@ -19,7 +19,7 @@ public class Simulator {
     Map<String, Integer> variables;
     
     private int simsPerSec;
-    private final int walkingSpeed = (int) (map.walkingSpeedPerSec / simsPerSec);
+    private int walkingSpeed;
     
     private long time = 0;
     
@@ -31,6 +31,7 @@ public class Simulator {
         this.objects = objects;
         this.simsPerSec = simulationsPerSec;
         variables = new HashMap<>();
+        this.walkingSpeed = (int) (map.walkingSpeedPerSec / simsPerSec);
     }
     
     public void simulationStep(){

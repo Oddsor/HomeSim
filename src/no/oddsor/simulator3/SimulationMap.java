@@ -19,7 +19,8 @@ class SimulationMap {
     */
     public final int walkingSpeedPerSec;
     
-    private String mapName;
+    public final String mapName;
+    
     private Collection<Node> nodes;
     
     public SimulationMap(String mapName, int walkingDistancePerSec){

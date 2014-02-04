@@ -5,6 +5,8 @@ import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,11 +21,13 @@ abstract class AbstractTable implements DatabaseTable{
     private final SQLiteConnection db;
     private int id;
     private String tableName;
+    private Map<String, String> columns;
     
-    public AbstractTable(SQLiteConnection db, int id) throws SQLiteException{
+    public AbstractTable(SQLiteConnection db, int id, String tableName, Map<String, String> columns) throws SQLiteException{
         if(!db.isOpen()) db.open();
         this.db = db;
         this.id = id;
+        this.columns = columns;
     }
     
     public static void createSimpleTable(String tableName, Map<String, String> columns, 
@@ -40,6 +44,25 @@ abstract class AbstractTable implements DatabaseTable{
         }
         dbConn.open();
         dbConn.exec(sql);
+    }
+    
+    public int update(){
+        
+        String sql = "";
+        if(id == -1){
+            sql += "INSERT INTO " + tableName + " VALUES(null, ";
+        }else{
+            
+        }
+        int resultingId = -1;
+        try {
+            db.exec(sql);
+            resultingId = (int) db.getLastInsertId();
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+        
+        return resultingId;
     }
     
     public boolean remove(){
