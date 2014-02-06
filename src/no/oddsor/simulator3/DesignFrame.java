@@ -1,8 +1,9 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator2.db_tables.Options;
+import no.oddsor.simulator3.enums.ObjectTypes;
 import com.almworks.sqlite4java.SQLiteConnection;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import no.oddsor.simulator2.db_tables.Node;
 
 /**
  *
@@ -33,6 +33,9 @@ public class DesignFrame extends JFrame implements ActionListener{
     
     private JCheckBox isStart;
     private Node selectedNode;
+    
+    private JComboBox chooser;
+    private JList lister;
     
     public DesignFrame(MainFrame frame, SQLiteConnection db){
         this.mainFrame = frame;
@@ -53,7 +56,7 @@ public class DesignFrame extends JFrame implements ActionListener{
         
         menuBox.add(nodePanel);
         menuBox.add(mouseLocation);
-        
+        menuBox.setPreferredSize(new Dimension(200, 300));
         
         horizontal.add(menuBox);
         horizontal.add(painter);
@@ -62,33 +65,61 @@ public class DesignFrame extends JFrame implements ActionListener{
     }
 
     void setActiveNode(Node selectedPoint) {
-        nodePanel = new JPanel();
+        System.out.println("Active: " + selectedPoint.id);
+        nodePanel.removeAll();
+        Box pan = Box.createVerticalBox();
         isStart = new JCheckBox("Starting point");
         isStart.addActionListener(this);
-        Node start = (Node) mainFrame.options.get(Options.START_LOCATION);
+        int start = 0;
         
-        if(selectedPoint.id == start.id){
+        if(selectedPoint.id == start){
             isStart.setSelected(true);
             isStart.setEnabled(false);
         }
         selectedNode = selectedPoint;
-        nodePanel.add(isStart);
+        pan.add(isStart);
         
-        Object[] objectList = HouseObjects.values();
-        JComboBox chooser = new JComboBox(objectList);
-        nodePanel.add(chooser);
+        Object[] objectList = ObjectTypes.values();
+        chooser = new JComboBox(objectList);
+        pan.add(chooser);
+        Box buttens = Box.createHorizontalBox();
         JButton adder = new JButton("Add");
-        nodePanel.add(adder);
+        adder.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                selectedNode.addObject(ObjectTypes.valueOf(chooser.getSelectedItem().toString()));
+                setActiveNode(selectedNode);
+            }
+        });
+        buttens.add(adder);
         JButton remover = new JButton("Remove");
-        nodePanel.add(remover);
+        remover.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                selectedNode.removeObject(ObjectTypes.valueOf(lister.getSelectedValue().toString()));
+                setActiveNode(selectedNode);
+            }
+        });
+        buttens.add(remover);
+        pan.add(buttens);
         Iterator it = selectedPoint.types.iterator();
         ArrayList<String> list = new ArrayList<>();
         while(it.hasNext()){
-            list.add(it.next().toString());
+            HouseObject obj = (HouseObject) it.next();
+            list.add(obj.type.name());
         }
         Object[] nodeObjects = new Object[list.size()];
-        JList lister = new JList(nodeObjects);
-        nodePanel.add(lister);
+        for(int i = 0; i < nodeObjects.length; i++){
+            nodeObjects[i] = list.get(i);
+            System.out.println(list.get(i));
+        }
+        lister = new JList(nodeObjects);
+        lister.setVisibleRowCount(5);
+        pan.add(lister);
+        nodePanel.add(pan);
+        pack();
     }
     
     void setMouseLocation(Point location){
@@ -97,9 +128,9 @@ public class DesignFrame extends JFrame implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if(ae.getSource().equals(isStart)){
+        /*if(ae.getSource().equals(isStart)){
             mainFrame.options.remove(Options.START_LOCATION);
             mainFrame.options.put(Options.START_LOCATION, selectedNode);
-        }
+        }*/
     }
 }

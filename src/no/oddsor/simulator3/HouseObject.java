@@ -1,6 +1,9 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.enums.ObjectTypes;
+import no.oddsor.simulator3.enums.Item;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -10,32 +13,40 @@ import java.util.Map;
 public class HouseObject implements Entity{
     
     Map<Item, Integer> inventory;
-    HouseObjects type;
+    ObjectTypes type;
     Node location;
     
-    public HouseObject(HouseObjects itemType, Node location){
+    public HouseObject(ObjectTypes itemType, Node location){
         this.type = itemType;
         this.location = location;
+        inventory = new HashMap<>();
     }
 
-    @Override
-    public void remove(Item item, int amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void add(Item item, int amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Node getLocation(){
+        return location;
     }
 
     @Override
     public boolean hasItem(Item item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(inventory.containsKey(item))return true;
+        return false;   
     }
 
     @Override
-    public int getAmount(Item item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void removeItem(Item item, int amount) {
+        inventory.put(item, getAmountOfItem(item) - amount);
     }
-    
+
+    @Override
+    public void addItem(Item item, int amount) {
+        inventory.put(item, getAmountOfItem(item) + amount);
+    }
+
+    @Override
+    public int getAmountOfItem(Item item) {
+        int amount = 0;
+        if(inventory.get(item) != null) amount = inventory.get(item);
+        return amount;
+    }
+
 }

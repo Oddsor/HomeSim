@@ -1,7 +1,11 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.enums.NeedType;
+import no.oddsor.simulator3.enums.ObjectTypes;
 import java.util.ArrayList;
+import no.oddsor.simulator3.enums.Item;
+
 
 /**
  *
@@ -15,19 +19,24 @@ public class TaskSingleton {
     
     private TaskSingleton(){
         tasks = new ArrayList<>();
-        
-        Task getIngredients = new Task("Get ingredients from fridge", 10);
-        getIngredients.addResultingItem(Item.RAW_FOOD);
+        Task getIngredients = new Task("Get ingredients from fridge", 10, null, 0, 0, ObjectTypes.REFRIDGERATOR);
+        getIngredients.addResultingItem(true, Item.RAW_FOOD, 1);
+        getIngredients.addRequiredItem(false, Item.RAW_FOOD, 1);
         tasks.add(getIngredients);
         
-        Task cookFood = new Task("Cook food on oven", 200);
-        cookFood.addRequiredItem(Item.RAW_FOOD);
-        cookFood.addResultingItem(Item.COOKED_FOOD);
-        tasks.add(new Task("Cook food", 240));
+        Task cookFood = new Task("Cook food on oven", 60*5, null, 15, 19, ObjectTypes.OVEN);
+        cookFood.addRequiredItem(true, Item.RAW_FOOD, 1);
+        cookFood.addResultingItem(false, Item.COOKED_FOOD, 1);
+        tasks.add(cookFood);
         
-        Task eatDinner = new Task("Eat cooked food", 100);
-        eatDinner.addRequiredItem(Item.COOKED_FOOD);
+        Task eatDinner = new Task("Eat cooked food", 60*5, null, 15, 19, ObjectTypes.CHAIR);
+        eatDinner.addRequiredItem(true, Item.COOKED_FOOD, 1);
         tasks.add(eatDinner);
+        
+        Task sleep = new Task("Sleep", 60*120, null, 21, 6, ObjectTypes.BED);
+        sleep.addResult(NeedType.ENERGY, 100);
+        sleep.addRequiredItem(true, Item.NO_CLOTHES, 1);
+        tasks.add(sleep);
     }
     
     

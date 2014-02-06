@@ -17,7 +17,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JSeparator;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
+import sun.awt.VerticalBagLayout;
 
 /**
  *
@@ -28,6 +32,12 @@ public class MainFrame extends JFrame{
     private DatabaseHandler dbHandler;
     private SQLiteConnection db;
     private LayoutManager2 layout;
+    private JPanel allNeeds;
+    private JLabel timeLabel;
+    Timer tim;
+    Simulator sim;
+    
+    private HashMap<String, JProgressBar> needBars;
     
     private DesignFrame designer;
     
@@ -45,15 +55,19 @@ public class MainFrame extends JFrame{
             }
         });
 
+        sim = null;
+        needBars = new HashMap<>();
         try{
             dbHandler = new DatabaseHandler();
             db = dbHandler.getDb();
             db.open();
-            SimulationMap map = new SimulationMap("appsketch.jpg", 50);
-            Simulator sim = new Simulator(rootPaneCheckingEnabled, 
-                    map, null, null, 10);
-            painter = new SimulationDisplay(sim, 
-                    "appsketch.jpg", new Point(), db);
+            SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, db);
+            ArrayList<Person> people = new ArrayList<>();
+            people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0)));
+            people.add(new Person("Obama", "obama-head.png", new Point(0, 0)));
+            sim = new Simulator(rootPaneCheckingEnabled, 
+                    map, people, 10);
+            painter = new SimulationDisplay("appsketch.jpg", new Point(), db);
             designer = new DesignFrame(this, db);
         }catch(Exception e){
             e.printStackTrace();
@@ -62,19 +76,32 @@ public class MainFrame extends JFrame{
         Box box = Box.createHorizontalBox();
         Box menubox = Box.createVerticalBox();
         
-        ArrayList<String> demo = new ArrayList<>();
-        demo.add("Hunger");
-        demo.add("Fun");
-        demo.add("Energy");
-        
-        JPanel needsPanel = new JPanel(new GridLayout(demo.size(), 2));
-        for(String str: demo){
-            needsPanel.add(new JLabel(str));
-            needsPanel.add(new JProgressBar(0, 100));
+        allNeeds = new JPanel(new VerticalBagLayout());
+        ArrayList<Person> allPeople = sim.getPeople();
+        for(Person person: allPeople){
+            ArrayList<Need> personNeeds = person.getSortedNeeds();
+            JPanel needsPanel = new JPanel(new GridLayout(person.getSortedNeeds().size() + 1, 2));
+            needsPanel.add(new JLabel("Person:"));
+            needsPanel.add(new JLabel(person.name));
+            for(Need need: personNeeds){
+                needsPanel.add(new JLabel(need.name()));
+                JProgressBar prog = new JProgressBar(0, 100);
+                prog.setName(person.name + "," + need.name());
+                prog.setValue((int) need.getValue());
+                prog.setString("" + (int) need.getValue());
+                prog.setStringPainted(true);
+                needBars.put(prog.getName(), prog);
+                needsPanel.add(prog);
+                needsPanel.setMaximumSize(needsPanel.getPreferredSize());
+                allNeeds.add(needsPanel);
+                allNeeds.add(new JSeparator(JSeparator.HORIZONTAL));
+            }
         }
-        needsPanel.setMaximumSize(needsPanel.getPreferredSize());
-        menubox.add(needsPanel);
+        menubox.add(allNeeds);
+        timeLabel = new JLabel("Tim");
+        menubox.add(timeLabel);
         menubox.add(new JPanel());
+        
         Box bottomButtonBox = Box.createHorizontalBox();
         menubox.add(bottomButtonBox);
         
@@ -89,9 +116,46 @@ public class MainFrame extends JFrame{
         bottomButtonBox.add(new JButton("Start sim"));
         bottomButtonBox.add(editButton);
         box.add(painter);
+        painter.update(sim.getPeople());
         box.add(menubox);
         add(box);
+        ActionListener timeListen = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                sim.simulationStep();
+                painter.update(sim.getPeople());
+                updateMenu();
+            }
+        };
+        tim = new Timer(10, timeListen);
+        JButton startStop = new JButton("Start");
+        startStop.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                tim.start();
+            }
+        });
+        menubox.add(startStop);
         pack();
+    }
+    
+    public void updateMenu(){
+        ArrayList<Person> people = sim.getPeople();
+        for(Person person: people){
+            ArrayList<Need> needs = person.getSortedNeeds();
+            for(Need need: needs){
+                JProgressBar p = needBars.get(person.name+","+need.name());
+                p.setValue((int) need.getValue());
+                p.setString("" + (int) need.getValue());
+            }
+        }
+        timeLabel.setText("W: " + sim.time.getWeek(sim.currentTime) + 
+                ", D: " + sim.time.getDayName(sim.currentTime) + 
+                ", " + sim.time.getNumberFormatted(sim.time.getHours(sim.currentTime)) + 
+                ":" + sim.time.getNumberFormatted(sim.time.getMinutes(sim.currentTime)) +
+                ":" + sim.time.getNumberFormatted(sim.time.getSeconds(sim.currentTime)));
     }
     
     public static void main(String[] args){

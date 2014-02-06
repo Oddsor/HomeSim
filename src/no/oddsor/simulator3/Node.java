@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.enums.ObjectTypes;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
@@ -18,11 +19,13 @@ class Node extends AbstractTable{
     
     private Point location;
     private ArrayList<Node> neighbours;
+    public ArrayList<HouseObject> types;
 
     public Node(SQLiteConnection db, int id, Point location) throws SQLiteException {
         super(db, id, tableName, null);
         this.location = location;
-        ArrayList<Node> neighbours = new ArrayList<>();
+        this.neighbours = new ArrayList<>();
+        this.types = new ArrayList<>();
     }
     
     private void addNeighbour(Node node){
@@ -32,9 +35,9 @@ class Node extends AbstractTable{
         neighbours.add(node);
     }
 
-    Collection<Node> getNeighbours() {
+    public Collection<Node> getNeighbours() {
         
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return neighbours;
     }
     
     public double distance(Point p){
@@ -43,6 +46,10 @@ class Node extends AbstractTable{
     
     public Point getLocation(){
         return location;
+    }
+    
+    public void setLocation(int x, int y){
+        location = new Point(x, y);
     }
     
     public void update(){
@@ -56,6 +63,10 @@ class Node extends AbstractTable{
                 db.exec("UPDATE node SET x = " + location.x + ", y=" + location.y + " WHERE id = " + id + ";");
                 System.out.println("Updated node's location");
             }
+            db.exec("DELETE FROM node_objects WHERE nodeid = " + id);
+            for(HouseObject type: types){
+                db.exec("INSERT INTO node_objects VALUES(null, " + id + ", '" + type.type + "');");
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -68,6 +79,12 @@ class Node extends AbstractTable{
             while (st.step()){
                 Node nod = new Node(db, st.columnInt(0), 
                         new Point(st.columnInt(1), st.columnInt(2)));
+                ArrayList<HouseObject> types = new ArrayList<>();
+                SQLiteStatement st2 = db.prepare("SELECT * FROM node_objects WHERE nodeid = " + st.columnInt(0) + ";");
+                while(st2.step()){
+                    types.add(new HouseObject(ObjectTypes.valueOf(st2.columnString(2)), nod));
+                }
+                nod.types = types;
                 nodes.add(nod);
             }
             ArrayList<Edge> edges = Edge.getEdges(nodes, db);
@@ -81,6 +98,21 @@ class Node extends AbstractTable{
             e.printStackTrace();
         }finally{
             return nodes;
+        }
+    }
+    
+    public void addObject(ObjectTypes type){
+        if(types.add(new HouseObject(type, this))){
+            update();
+        }
+    }
+    
+    public void removeObject(ObjectTypes type){
+        for(HouseObject obj: types){
+            if(obj.type == type){
+                types.remove(obj);
+                update();
+            }
         }
     }
 }

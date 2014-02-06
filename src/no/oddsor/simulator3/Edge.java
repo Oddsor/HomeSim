@@ -77,7 +77,7 @@ public class Edge {
         }
     }
     
-    public boolean exists(ArrayList<Edge> edges, Point p1, Point p2){
+    public boolean exists(ArrayList<Edge> edges, Node p1, Node p2){
         boolean result = false;
         if(edges.isEmpty()) return false;
         for(Edge edge: edges){

@@ -7,7 +7,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import no.oddsor.simulator3.HouseObjects;
+import no.oddsor.simulator3.enums.ObjectTypes;
 
 /**
  *
@@ -20,10 +20,10 @@ public class Node extends Point{
         try{
             SQLiteStatement st = db.prepare("SELECT * FROM node");
             while (st.step()){
-                Set<HouseObjects> types = new HashSet<>();
+                Set<ObjectTypes> types = new HashSet<>();
                 SQLiteStatement st2 = db.prepare("SELECT * FROM node_objects WHERE nodeid = " + st.columnInt(1) + ";");
                 while(st2.step()){
-                    types.add(HouseObjects.valueOf(st2.columnString(2)));
+                    types.add(ObjectTypes.valueOf(st2.columnString(2)));
                 }
                 nodes.add(new Node(st.columnInt(0), st.columnInt(1), st.columnInt(2)));
             }
@@ -46,7 +46,7 @@ public class Node extends Point{
     }
     
     public int id;
-    public Set<HouseObjects> types;
+    public Set<ObjectTypes> types;
     
     public Node(int id, int x, int y){
         this.id = id;
@@ -55,7 +55,7 @@ public class Node extends Point{
         this.types = new HashSet<>();
     }
     
-    public Node(int id, int x, int y, Set<HouseObjects> types){
+    public Node(int id, int x, int y, Set<ObjectTypes> types){
         this.id = id;
         this.x = x;
         this.y = y;
@@ -76,8 +76,8 @@ public class Node extends Point{
                 System.out.println("Updated node's location");
             }
             db.exec("DELETE FROM node_objects WHERE nodeid = " + id);
-            for(HouseObjects type: types){
-                db.exec("INSERT INTO node_objects VALUES(null, " + id + ", " + type + ");");
+            for(ObjectTypes type: types){
+                db.exec("INSERT INTO node_objects VALUES(null, " + id + ", '" + type + "');");
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -93,13 +93,13 @@ public class Node extends Point{
         }
     }
     
-    public void addObject(HouseObjects type, SQLiteConnection db){
+    public void addObject(ObjectTypes type, SQLiteConnection db){
         if(types.add(type)){
             update(db);
         }
     }
     
-    public void removeObject(HouseObjects type, SQLiteConnection db){
+    public void removeObject(ObjectTypes type, SQLiteConnection db){
         if(types.remove(type)){
             update(db);
         }

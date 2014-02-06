@@ -2,7 +2,7 @@
 package no.oddsor.simulator2.db_tables;
 
 import java.util.ArrayList;
-import no.oddsor.simulator3.HouseObjects;
+import no.oddsor.simulator3.enums.ObjectTypes;
 
 /**
  *
@@ -18,19 +18,19 @@ public class ObjectLocation{
     
     int id;
     Node node;
-    ArrayList<HouseObjects> types;
+    ArrayList<ObjectTypes> types;
     
-    public ObjectLocation(int id, Node node, ArrayList<HouseObjects> types){
+    public ObjectLocation(int id, Node node, ArrayList<ObjectTypes> types){
         this.id = id;
         this.node = node;
         this.types = types;
     }
     
-    public void addType(HouseObjects type){
+    public void addType(ObjectTypes type){
         types.add(type);
     }
     
-    public ArrayList<HouseObjects> getTypes(){
+    public ArrayList<ObjectTypes> getTypes(){
         return types;
     }
     

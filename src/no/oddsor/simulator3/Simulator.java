@@ -4,7 +4,9 @@ package no.oddsor.simulator3;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -13,25 +15,27 @@ import java.util.Map;
 public class Simulator {
     
     ArrayList<Person> people;
-    ArrayList<HouseObjects> objects;
     SimulationMap map;
+    ArrayList<Task> tasks;
+    Set<Node> blockedNodes;
    
-    Map<String, Integer> variables;
+    //Map<String, Integer> variables;
     
     private int simsPerSec;
     private int walkingSpeed;
+    public Time time;
+    public double currentTime;
     
-    private long time = 0;
-    
-    //TODO make resumable
-    public Simulator(boolean restart, SimulationMap map, ArrayList<Person> people, 
-            ArrayList<HouseObjects> objects, int simulationsPerSec){
+    public Simulator(boolean restart, SimulationMap map, ArrayList<Person> people, int simulationsPerSec){
         this.people = people;
         this.map = map;
-        this.objects = objects;
         this.simsPerSec = simulationsPerSec;
-        variables = new HashMap<>();
+        this.time = new Time(0);
+        this.currentTime = 0;
+        this.blockedNodes = new HashSet<>();
         this.walkingSpeed = (int) (map.walkingSpeedPerSec / simsPerSec);
+        System.out.println("walkspeed: " + walkingSpeed);
+        this.tasks = TaskSingleton.getTaskList();
     }
     
     public void simulationStep(){
@@ -39,12 +43,12 @@ public class Simulator {
             ArrayList<Node> route = person.getRoute();
             if(route != null){ //We're traveling!
                 person.setLocation(moveToPoint(person.currentLocation(), route.get(0)));
-            }else{ //TODO else if not doing target task, do task
-                person.setTask(getNextTask(person.getSortedNeeds()), map);
+            }else if(person.getTask() == null){ //TODO else if not doing target task, do task
+                person.setTask(getNextTask(person), map);
             }
-            person.passTime(1/simsPerSec);
+            person.passTime(1.0/simsPerSec);
         }
-        time += (1/simsPerSec);
+        currentTime += (1.0/simsPerSec);
     }
     
     private Point moveToPoint(Point currentLocation, Node targetNode){
@@ -61,12 +65,34 @@ public class Simulator {
         return p;
     }
     
-    private Task getNextTask(ArrayList<Need> sortedNeeds){
+    private Task getNextTask(Person p){
+        ArrayList<Need> needs = p.getSortedNeeds();
         Task task = null;
-        for(Need need: sortedNeeds){
-            
+        ArrayList<Task> filtered = filterAvailableTasks(tasks);
+        for(Need need: needs){
+            if(need.getValue() > 60) continue;
+            for(Task fTask: filtered){
+                if(fTask.fulfilledNeed != null && fTask.fulfilledNeed == need.type()){
+                    if(fTask == null){
+                        
+                    }
+                }
+            }
         }
         return task;
     }
     
+    private ArrayList<Task> filterAvailableTasks(ArrayList<Task> allTasks){
+        ArrayList<Task> filteredTasks = new ArrayList<>();
+        
+        for(Task task: allTasks){
+            if(task.taskAvailable(time.getDay(currentTime), time.getHours(currentTime))) filteredTasks.add(task);
+        }
+        
+        return filteredTasks;
+    }
+    
+    public ArrayList<Person> getPeople(){
+        return people;
+    }
 }

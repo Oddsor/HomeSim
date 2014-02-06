@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import javax.swing.JPanel;
-import no.oddsor.simulator2.db_tables.Edge;
-import no.oddsor.simulator2.db_tables.Node;
 
 public class NodePainter extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 
@@ -75,26 +73,26 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
         g.setColor(Color.red);
         if(points != null && !points.isEmpty()){
             for(int i = 0; i < points.size(); i++){
-                g.fillOval(points.get(i).x - 4, points.get(i).y - 4, 8, 8);
+                g.fillOval(points.get(i).getLocation().x - 4, points.get(i).getLocation().y - 4, 8, 8);
             }
         }
         
         g.setColor(Color.yellow);
-        if(hoveredPoint != null) g.fillOval(hoveredPoint.x - 4, hoveredPoint.y - 4, 8, 8);
+        if(hoveredPoint != null) g.fillOval(hoveredPoint.getLocation().x - 4, hoveredPoint.getLocation().y - 4, 8, 8);
         
         g.setColor(Color.red);
-        if(selectedPoint != null) g.fillOval(selectedPoint.x - 6, selectedPoint.y - 6, 12, 12);
+        if(selectedPoint != null) g.fillOval(selectedPoint.getLocation().x - 6, selectedPoint.getLocation().y - 6, 12, 12);
         g.setColor(Color.yellow);
-        if(selectedPoint != null) g.fillOval(selectedPoint.x - 4, selectedPoint.y - 4, 8, 8);
+        if(selectedPoint != null) g.fillOval(selectedPoint.getLocation().x - 4, selectedPoint.getLocation().y - 4, 8, 8);
         
         
         g.setColor(Color.BLACK);
         
         for (int i = 0; i < edges.size(); i++)
         {
-            g.drawLine(edges.get(i).a.x, edges.get(i).a.y, edges.get(i).b.x, edges.get(i).b.y);
+            g.drawLine(edges.get(i).a.getLocation().x, edges.get(i).a.getLocation().y, edges.get(i).b.getLocation().x, edges.get(i).b.getLocation().y);
         }
-        if(drawingLine) g.drawLine(selectedPoint.x, selectedPoint.y, xDragged, yDragged);
+        if(drawingLine) g.drawLine(selectedPoint.getLocation().x, selectedPoint.getLocation().y, xDragged, yDragged);
     }
 
     
@@ -110,15 +108,15 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
     @Override
     public void mouseMoved(MouseEvent arg0) {
         if(hoveredPoint != null){
-            if((arg0.getX() < hoveredPoint.x - 4 || arg0.getX() > hoveredPoint.x + 4) ||
-                        (arg0.getY() < hoveredPoint.y - 4 || arg0.getY() > hoveredPoint.y + 4)){
+            if((arg0.getX() < hoveredPoint.getLocation().x - 4 || arg0.getX() > hoveredPoint.getLocation().x + 4) ||
+                        (arg0.getY() < hoveredPoint.getLocation().y - 4 || arg0.getY() > hoveredPoint.getLocation().y + 4)){
                     hoveredPoint = null;
                     repaint();
                 }
         }else{
             for(Node point: points){
-                if((arg0.getX() > point.x - 4 && arg0.getX() < point.x + 4) &&
-                        (arg0.getY() > point.y - 4 && arg0.getY() < point.y + 4)){
+                if((arg0.getX() > point.getLocation().x - 4 && arg0.getX() < point.getLocation().x + 4) &&
+                        (arg0.getY() > point.getLocation().y - 4 && arg0.getY() < point.getLocation().y + 4)){
                     hoveredPoint = point;
                     repaint();
                 }
@@ -168,8 +166,8 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
         //if(draggingPoint == true) draggingPoint = false;
         if(selectedPoint != null && arg0.getButton() == MouseEvent.BUTTON1 && drawingLine){
             for(Node point: points){
-                if((arg0.getX() > point.x - 4 && arg0.getX() < point.x + 4) &&
-                            (arg0.getY() > point.y - 4 && arg0.getY() < point.y + 4)){
+                if((arg0.getX() > point.getLocation().x - 4 && arg0.getX() < point.getLocation().x + 4) &&
+                            (arg0.getY() > point.getLocation().y - 4 && arg0.getY() < point.getLocation().y + 4)){
                     Edge edg = new Edge(-1, point, selectedPoint);
                     if(!edg.exists(edges, point, selectedPoint)){
                         edg.update(db);
@@ -187,14 +185,18 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
             selectedPoint = hoveredPoint;
             simFrame.setActiveNode(selectedPoint);
         }else if(hoveredPoint != null && draggingPoint){
-            hoveredPoint.update(db);
+            hoveredPoint.update();
         }else if(arg0.getButton() == MouseEvent.BUTTON3 && selectedPoint != null){
             selectedPoint = null;
         }
         else if(arg0.getButton() == MouseEvent.BUTTON3 && selectedPoint == null){
-            Node nod = new Node(-1, arg0.getX(), arg0.getY());
-            nod.update(db);
-            points.add(nod);
+            try{
+                Node nod = new Node(db, -1, new Point(arg0.getX(), arg0.getY()));
+                nod.update();
+                points.add(nod);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
         repaint();
     }
@@ -218,7 +220,7 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
         if(KeyEvent.VK_SHIFT == ke.getKeyCode()){
             draggingPoint = false;
             if(hoveredPoint != null){
-                hoveredPoint.update(db);
+                hoveredPoint.update();
             }
         }else if(KeyEvent.VK_CONTROL == ke.getKeyCode()){
             drawingLine = false;
@@ -236,7 +238,7 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
                             if(!edges.isEmpty()) j = -1;
                         }
                     }
-                    selectedPoint.remove(db);
+                    selectedPoint.remove();
                     selectedPoint = null;
                     repaint();
                     break;
