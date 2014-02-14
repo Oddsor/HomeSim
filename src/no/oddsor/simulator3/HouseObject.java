@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import java.util.Collection;
 import no.oddsor.simulator3.enums.ObjectTypes;
 import no.oddsor.simulator3.enums.Item;
 import java.util.HashMap;
@@ -48,5 +49,4 @@ public class HouseObject implements Entity{
         if(inventory.get(item) != null) amount = inventory.get(item);
         return amount;
     }
-
 }

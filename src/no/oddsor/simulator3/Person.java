@@ -4,13 +4,18 @@ package no.oddsor.simulator3;
 import no.oddsor.simulator3.enums.Item;
 import java.awt.Image;
 import java.awt.Point;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import net.oddsor.AStarMulti.AStarMulti;
+import net.oddsor.AStarMulti.AStarNode;
 import no.oddsor.simulator3.enums.NeedType;
 
 /**
@@ -20,8 +25,8 @@ import no.oddsor.simulator3.enums.NeedType;
 class Person implements Entity{
 
     private Point currentLocation;
-    private ArrayList<Node> route;
-    private ArrayList<Need> needs;
+    private Queue<Node> route;
+    private List<Need> needs;
     private Task currentTask;
     private double taskCount;
     public final String name;
@@ -35,8 +40,8 @@ class Person implements Entity{
         this.avatarImg = new ImageIcon(getClass().getResource(avatarImage)).getImage();
         needs = new ArrayList<>();
         NeedType[] needlist = NeedType.values();
-        for(int i = 0; i < needlist.length; i++){
-            needs.add(new Need(needlist[i], 100.0));
+        for (NeedType needlist1 : needlist) {
+            needs.add(new Need(needlist1, 100.0));
         }
     }
     
@@ -44,7 +49,7 @@ class Person implements Entity{
         return currentLocation;
     }
 
-    ArrayList<Node> getRoute() {
+    Queue<Node> getRoute() {
         if(route == null || route.isEmpty()) return null;
         return route;
     }
@@ -52,12 +57,12 @@ class Person implements Entity{
     void setLocation(Point moveToPoint) {
         currentLocation = moveToPoint;
         if((route != null || !route.isEmpty()) && 
-                currentLocation.distance(route.get(0).getLocation()) == 0){
-            route.remove(0);
+                currentLocation.distance(route.peek().getLocation()) == 0){
+            route.remove();
         }
     }
     
-    public ArrayList<Need> getSortedNeeds(){
+    public List<Need> getSortedNeeds(){
         return needs;
     }
 
@@ -66,7 +71,15 @@ class Person implements Entity{
             currentTask = nextTask;
             taskCount = currentTask.durationSeconds;
             System.out.println(name + " decided to do " + currentTask.taskName);
-            route = map.getRouteToObject(currentTask.getViableObjects(map.objects), currentLocation);
+            Collection<Node> nodes = new ArrayList<>();
+            for(HouseObject object: currentTask.getViableObjects(map.objects)){
+                nodes.add(object.getLocation());
+            }
+            try {
+                route = AStarMulti.getRoute(nodes, map.getClosestNode(currentLocation));
+            } catch (Exception ex) {
+                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
@@ -89,8 +102,7 @@ class Person implements Entity{
 
     @Override
     public boolean hasItem(Item item) {
-        if(inventory.containsKey(item))return true;
-        return false;   
+        return inventory.containsKey(item);   
     }
 
     @Override

@@ -11,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,7 +21,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import sun.awt.VerticalBagLayout;
 
 /**
@@ -79,7 +79,7 @@ public class MainFrame extends JFrame{
         allNeeds = new JPanel(new VerticalBagLayout());
         ArrayList<Person> allPeople = sim.getPeople();
         for(Person person: allPeople){
-            ArrayList<Need> personNeeds = person.getSortedNeeds();
+            List<Need> personNeeds = person.getSortedNeeds();
             JPanel needsPanel = new JPanel(new GridLayout(person.getSortedNeeds().size() + 1, 2));
             needsPanel.add(new JLabel("Person:"));
             needsPanel.add(new JLabel(person.name));
@@ -144,7 +144,7 @@ public class MainFrame extends JFrame{
     public void updateMenu(){
         ArrayList<Person> people = sim.getPeople();
         for(Person person: people){
-            ArrayList<Need> needs = person.getSortedNeeds();
+            List<Need> needs = person.getSortedNeeds();
             for(Need need: needs){
                 JProgressBar p = needBars.get(person.name+","+need.name());
                 p.setValue((int) need.getValue());

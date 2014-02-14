@@ -2,11 +2,11 @@
 package no.oddsor.simulator3;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import no.oddsor.simulator3.enums.NeedType;
 import no.oddsor.simulator3.enums.ObjectTypes;
 import no.oddsor.simulator3.enums.Item;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +56,7 @@ class Task {
     }
     
     public void addRequiredItem(boolean person, Item item, int amount){
-        if(person) resultingPersonInventory.put(item, amount);
+        if(person) requiredPersonInventory.put(item, amount);
         requiredObjectInventory.put(item, amount);
     }
     public void addResultingItem(boolean person, Item item, int amount){
@@ -68,18 +68,19 @@ class Task {
         
     }
     
-    public ArrayList<HouseObject> getViableObjects(ArrayList<HouseObject> allObjects){
-        ArrayList<HouseObject> objects = new ArrayList<>();
+    public Collection<HouseObject> getViableObjects(Collection<HouseObject> allObjects){
+        Collection<HouseObject> objects = new ArrayList<>();
         if(performedAt != null){
-            for(int i = 0; i < performedAt.length; i++){
-                for(HouseObject obj: allObjects){
-                    if(performedAt[i] == obj.type){
+            for (ObjectTypes performedAt1 : performedAt) {
+                for (HouseObject obj : allObjects) {
+                    if (performedAt1 == obj.type) {
                         Set<Item> items = requiredObjectInventory.keySet();
-                        Iterator it = items.iterator();
+                        Iterator<Item> it = items.iterator();
                         while(it.hasNext()){
-                            if(!obj.hasItem((Item) it.next())) continue;
+                            if(!obj.hasItem(it.next())) continue;
+                        
+                            objects.add(obj);
                         }
-                        objects.add(obj);
                     }
                 }
             }
@@ -96,8 +97,26 @@ class Task {
         if(startTime == 0 && endTime == 0) return true;
         int newEnd = (endTime - startTime) % 24;
         int newCurrent = (hour - startTime) % 24;
-        if(newCurrent > newEnd) return false;
         
+        return newCurrent <= newEnd;
+    }
+    
+    public boolean completable(Person p, ArrayList<HouseObject> allObjects){
+        Collection<HouseObject> viableObjects = getViableObjects(allObjects);
+        Iterator<Item> it = requiredPersonInventory.keySet().iterator();
+        while(it.hasNext()){
+            Item item = it.next();
+            if(!p.hasItem(item)){
+                System.out.println("Person has " + item.name());
+                return false;
+            }
+        }
+        for(HouseObject obj: viableObjects){
+            Iterator it2 = requiredObjectInventory.keySet().iterator();
+            while(it.hasNext()){
+                if(!obj.hasItem((Item) it2.next())) return false;
+            }
+        }
         return true;
     }
 }

@@ -8,17 +8,18 @@ import com.almworks.sqlite4java.SQLiteStatement;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import net.oddsor.AStarMulti.AStarNode;
 
 /**
  *
  * @author Odd
  */
-class Node extends AbstractTable{
+public class Node extends AbstractTable implements AStarNode{
     
     private static final String tableName = "node";
     
     private Point location;
-    private ArrayList<Node> neighbours;
+    private final Collection<Node> neighbours;
     public ArrayList<HouseObject> types;
 
     public Node(SQLiteConnection db, int id, Point location) throws SQLiteException {
@@ -33,11 +34,6 @@ class Node extends AbstractTable{
             if(nod.id == node.id) return;
         }
         neighbours.add(node);
-    }
-
-    public Collection<Node> getNeighbours() {
-        
-        return neighbours;
     }
     
     public double distance(Point p){
@@ -114,5 +110,19 @@ class Node extends AbstractTable{
                 update();
             }
         }
+    }
+
+    @Override
+    public Collection<Node> getNeighbours() {
+        return neighbours;
+    }
+
+    @Override
+    public double getDistance(AStarNode node) throws Exception{
+        if(node instanceof Node){
+            Node nodeTemp = (Node) node;
+            double distance = nodeTemp.distance(this.location);
+            return distance;
+        }else throw new Exception("Incompatible classtype " + node.getClass());
     }
 }

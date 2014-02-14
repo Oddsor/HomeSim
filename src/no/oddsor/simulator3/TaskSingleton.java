@@ -31,12 +31,22 @@ public class TaskSingleton {
         
         Task eatDinner = new Task("Eat cooked food", 60*5, null, 15, 19, ObjectTypes.CHAIR);
         eatDinner.addRequiredItem(true, Item.COOKED_FOOD, 1);
+        eatDinner.addResult(NeedType.HUNGER, 100);
         tasks.add(eatDinner);
         
         Task sleep = new Task("Sleep", 60*120, null, 21, 6, ObjectTypes.BED);
         sleep.addResult(NeedType.ENERGY, 100);
         sleep.addRequiredItem(true, Item.NO_CLOTHES, 1);
         tasks.add(sleep);
+        
+        Task washHands = new Task("Wash hands", 30, null, 0, 0, ObjectTypes.SINK);
+        washHands.addResult(NeedType.TOILET, 100);
+        washHands.addRequiredItem(true, Item.DIRTY_HANDS, 1);
+        tasks.add(washHands);
+        
+        Task useToilet = new Task("Use toilet", 120, null, 0, 0, ObjectTypes.TOILET);
+        useToilet.addResultingItem(true, Item.DIRTY_HANDS, 1);
+        tasks.add(useToilet);
     }
     
     

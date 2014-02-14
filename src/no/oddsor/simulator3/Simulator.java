@@ -3,9 +3,9 @@ package no.oddsor.simulator3;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -40,9 +40,9 @@ public class Simulator {
     
     public void simulationStep(){
         for(Person person: people){
-            ArrayList<Node> route = person.getRoute();
+            Queue<Node> route = person.getRoute();
             if(route != null){ //We're traveling!
-                person.setLocation(moveToPoint(person.currentLocation(), route.get(0)));
+                person.setLocation(moveToPoint(person.currentLocation(), route.peek()));
             }else if(person.getTask() == null){ //TODO else if not doing target task, do task
                 person.setTask(getNextTask(person), map);
             }
@@ -66,16 +66,16 @@ public class Simulator {
     }
     
     private Task getNextTask(Person p){
-        ArrayList<Need> needs = p.getSortedNeeds();
+        List<Need> needs = p.getSortedNeeds();
         Task task = null;
         ArrayList<Task> filtered = filterAvailableTasks(tasks);
+        ArrayList<Task> goalTasks = getGoalTasks(filtered);
         for(Need need: needs){
             if(need.getValue() > 60) continue;
-            for(Task fTask: filtered){
-                if(fTask.fulfilledNeed != null && fTask.fulfilledNeed == need.type()){
-                    if(fTask == null){
-                        
-                    }
+            for(Task fTask: goalTasks){
+                if(fTask.fulfilledNeed != null && fTask.fulfilledNeed == need.type() 
+                        && fTask.completable(p, map.objects)){
+                    task = fTask;
                 }
             }
         }
@@ -90,6 +90,15 @@ public class Simulator {
         }
         
         return filteredTasks;
+    }
+    
+    private ArrayList<Task> getGoalTasks(ArrayList<Task> allTasks){
+        ArrayList<Task> goalTasks = new ArrayList<>();
+        for(Task task: allTasks){
+            if(task.fulfilledNeed == null) continue;
+            goalTasks.add(task);
+        }
+        return goalTasks;
     }
     
     public ArrayList<Person> getPeople(){
