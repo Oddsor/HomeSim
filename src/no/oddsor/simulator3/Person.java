@@ -4,9 +4,9 @@ package no.oddsor.simulator3;
 import no.oddsor.simulator3.enums.Item;
 import java.awt.Image;
 import java.awt.Point;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
@@ -23,9 +23,10 @@ import no.oddsor.simulator3.enums.NeedType;
 public class Person implements Entity{
 
     private Point currentLocation;
-    private Queue<Node> route;
+    private Deque<Node> route;
     private final List<Need> needs;
     private Task currentTask;
+    private HouseObject usingObject;
     private double taskCount;
     public final String name;
     
@@ -71,12 +72,22 @@ public class Person implements Entity{
             taskCount = currentTask.durationSeconds;
             System.out.println(name + " decided to do " + currentTask.taskName);
             Collection<Node> nodes = new ArrayList<>();
+            Collection<Person> people = map.getPeople();
             for(HouseObject object: currentTask.getViableObjects(map.objects)){
-                nodes.add(object.getLocation());
+                boolean inUse = false;
+                for(Person p: people){
+                    if(p.usingObject != null && p.usingObject.equals(object)) inUse = true;
+                }
+                if(!inUse)nodes.add(object.getLocation());
             }
             System.out.println(nodes.size());
             try {
                 route = AStarMulti.getRoute(nodes, map.getClosestNode(currentLocation));
+                if(!route.isEmpty()){
+                    for(HouseObject object: currentTask.getViableObjects(map.objects)){
+                        if(object.getLocation().equals(route.getLast())) usingObject = object;
+                    }
+                }
             } catch (Exception ex) {
                 Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
             }

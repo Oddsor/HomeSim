@@ -4,6 +4,7 @@ package no.oddsor.simulator3;
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -19,10 +20,13 @@ public class SimulationMap {
     public final int startNodeId;
     
     private final ArrayList<Node> nodes;
+    private final Collection<Person> people;
     public ArrayList<HouseObject> objects;
     
-    public SimulationMap(String mapName, int walkingDistancePerSec, int startId, SQLiteConnection db){
+    public SimulationMap(String mapName, int walkingDistancePerSec, int startId, 
+            Collection<Person> people, SQLiteConnection db){
         this.mapName = mapName;
+        this.people = people;
         this.walkingSpeedPerSec = walkingDistancePerSec;
         this.startNodeId = startId;
         this.nodes = Node.getNodes(db);
@@ -47,5 +51,9 @@ public class SimulationMap {
             }
         }
         return smallestNode;
+    }
+    
+    public Collection<Person> getPeople(){
+        return people;
     }
 }

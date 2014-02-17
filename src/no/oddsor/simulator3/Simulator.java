@@ -31,9 +31,9 @@ public class Simulator {
      * @param people
      * @param simulationsPerSec
      */
-    public Simulator(SimulationMap map, Collection<Person> people, int simulationsPerSec){
-        this.people = people;
+    public Simulator(SimulationMap map, int simulationsPerSec){
         this.map = map;
+        this.people = map.getPeople();
         this.simsPerSec = simulationsPerSec;
         this.time = new Time(0);
         this.currentTime = 0;

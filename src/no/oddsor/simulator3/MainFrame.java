@@ -62,11 +62,11 @@ public class MainFrame extends JFrame{
             dbHandler = new DatabaseHandler();
             db = dbHandler.getDb();
             db.open();
-            SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, db);
             ArrayList<Person> people = new ArrayList<>();
             people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0)));
             people.add(new Person("Obama", "obama-head.png", new Point(0, 0)));
-            sim = new Simulator(map, people, 10);
+            SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, people, db);
+            sim = new Simulator(map, 10);
             painter = new SimulationDisplay("appsketch.jpg", new Point(), db);
             designer = new DesignFrame(this, db);
         }catch(Exception e){
