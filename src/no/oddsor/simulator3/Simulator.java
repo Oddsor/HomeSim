@@ -3,6 +3,7 @@ package no.oddsor.simulator3;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
@@ -14,27 +15,30 @@ import java.util.Set;
  */
 public class Simulator {
     
-    ArrayList<Person> people;
+    Collection<Person> people;
     SimulationMap map;
     ArrayList<Task> tasks;
-    Set<Node> blockedNodes;
-   
-    //Map<String, Integer> variables;
+    //Set<Node> blockedNodes;
     
-    private int simsPerSec;
-    private int walkingSpeed;
+    int simsPerSec;
+    int walkingSpeed;
     public Time time;
     public double currentTime;
     
-    public Simulator(boolean restart, SimulationMap map, ArrayList<Person> people, int simulationsPerSec){
+    /**
+     *
+     * @param map
+     * @param people
+     * @param simulationsPerSec
+     */
+    public Simulator(SimulationMap map, Collection<Person> people, int simulationsPerSec){
         this.people = people;
         this.map = map;
         this.simsPerSec = simulationsPerSec;
         this.time = new Time(0);
         this.currentTime = 0;
-        this.blockedNodes = new HashSet<>();
+        //this.blockedNodes = new HashSet<>();
         this.walkingSpeed = (int) (map.walkingSpeedPerSec / simsPerSec);
-        System.out.println("walkspeed: " + walkingSpeed);
         this.tasks = TaskSingleton.getTaskList();
     }
     
@@ -51,25 +55,26 @@ public class Simulator {
         currentTime += (1.0/simsPerSec);
     }
     
+    //TODO verify
     private Point moveToPoint(Point currentLocation, Node targetNode){
         Point p = new Point(currentLocation);
-        double distance = p.distance(currentLocation);
         Point targetLocation = targetNode.getLocation();
-        int dx = p.x - targetLocation.x;
-        int dy = p.y - targetLocation.y;
+        double distance = p.distance(targetLocation);
+        int dx = targetLocation.x - p.x;
+        int dy = targetLocation.y - p.y;
+        System.out.println("DX: " + dx + ", DY:" + dy + ", Distance: " + distance);
         if(distance < walkingSpeed) p.setLocation(targetLocation);
         else{
-            p.translate((int) (dx * (walkingSpeed / distance)), 
-                    (int) (dy * (walkingSpeed / distance)));
+            p.translate((int) (walkingSpeed * (dx / distance)), 
+                    (int) (walkingSpeed * (dy / distance)));
         }
         return p;
     }
     
     private Task getNextTask(Person p){
-        List<Need> needs = p.getSortedNeeds();
+        List<Need> needs = p.getNeeds();
         Task task = null;
-        ArrayList<Task> filtered = filterAvailableTasks(tasks);
-        ArrayList<Task> goalTasks = getGoalTasks(filtered);
+        ArrayList<Task> goalTasks = getGoalTasks(filterAvailableTasks(tasks));
         for(Need need: needs){
             if(need.getValue() > 60) continue;
             for(Task fTask: goalTasks){
@@ -88,7 +93,6 @@ public class Simulator {
         for(Task task: allTasks){
             if(task.taskAvailable(time.getDay(currentTime), time.getHours(currentTime))) filteredTasks.add(task);
         }
-        
         return filteredTasks;
     }
     
@@ -101,7 +105,7 @@ public class Simulator {
         return goalTasks;
     }
     
-    public ArrayList<Person> getPeople(){
+    public Collection<Person> getPeople(){
         return people;
     }
 }

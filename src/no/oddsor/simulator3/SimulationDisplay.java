@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -19,7 +20,7 @@ public class SimulationDisplay extends JPanel{
     private Point startPoint;
     private Image image;
     private SQLiteConnection db;
-    private ArrayList<Person> people;
+    private Collection<Person> people;
 
     public SimulationDisplay(String mapName, Point startPoint, SQLiteConnection db) {
         this.startPoint = startPoint;
@@ -43,7 +44,7 @@ public class SimulationDisplay extends JPanel{
         }
     }
     
-    public void update(ArrayList<Person> people){
+    public void update(Collection<Person> people){
         this.people = people;
         repaint();
     }

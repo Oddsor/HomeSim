@@ -8,30 +8,28 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import net.oddsor.AStarMulti.AStarMulti;
-import net.oddsor.AStarMulti.AStarNode;
 import no.oddsor.simulator3.enums.NeedType;
 
 /**
  *
  * @author Odd
  */
-class Person implements Entity{
+public class Person implements Entity{
 
     private Point currentLocation;
     private Queue<Node> route;
-    private List<Need> needs;
+    private final List<Need> needs;
     private Task currentTask;
     private double taskCount;
     public final String name;
     
-    private HashMap<Item, Integer> inventory;
+    private final HashMap<Item, Integer> inventory;
     public Image avatarImg;
     
     public Person(String name, String avatarImage, Point currentLocation){
@@ -43,6 +41,7 @@ class Person implements Entity{
         for (NeedType needlist1 : needlist) {
             needs.add(new Need(needlist1, 100.0));
         }
+        inventory = new HashMap<>();
     }
     
     Point currentLocation() {
@@ -62,7 +61,7 @@ class Person implements Entity{
         }
     }
     
-    public List<Need> getSortedNeeds(){
+    public List<Need> getNeeds(){
         return needs;
     }
 
@@ -75,6 +74,7 @@ class Person implements Entity{
             for(HouseObject object: currentTask.getViableObjects(map.objects)){
                 nodes.add(object.getLocation());
             }
+            System.out.println(nodes.size());
             try {
                 route = AStarMulti.getRoute(nodes, map.getClosestNode(currentLocation));
             } catch (Exception ex) {

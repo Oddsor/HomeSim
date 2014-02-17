@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.Box;
@@ -65,8 +66,7 @@ public class MainFrame extends JFrame{
             ArrayList<Person> people = new ArrayList<>();
             people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0)));
             people.add(new Person("Obama", "obama-head.png", new Point(0, 0)));
-            sim = new Simulator(rootPaneCheckingEnabled, 
-                    map, people, 10);
+            sim = new Simulator(map, people, 10);
             painter = new SimulationDisplay("appsketch.jpg", new Point(), db);
             designer = new DesignFrame(this, db);
         }catch(Exception e){
@@ -77,10 +77,10 @@ public class MainFrame extends JFrame{
         Box menubox = Box.createVerticalBox();
         
         allNeeds = new JPanel(new VerticalBagLayout());
-        ArrayList<Person> allPeople = sim.getPeople();
+        Collection<Person> allPeople = sim.getPeople();
         for(Person person: allPeople){
-            List<Need> personNeeds = person.getSortedNeeds();
-            JPanel needsPanel = new JPanel(new GridLayout(person.getSortedNeeds().size() + 1, 2));
+            List<Need> personNeeds = person.getNeeds();
+            JPanel needsPanel = new JPanel(new GridLayout(person.getNeeds().size() + 1, 2));
             needsPanel.add(new JLabel("Person:"));
             needsPanel.add(new JLabel(person.name));
             for(Need need: personNeeds){
@@ -142,9 +142,9 @@ public class MainFrame extends JFrame{
     }
     
     public void updateMenu(){
-        ArrayList<Person> people = sim.getPeople();
+        Collection<Person> people = sim.getPeople();
         for(Person person: people){
-            List<Need> needs = person.getSortedNeeds();
+            List<Need> needs = person.getNeeds();
             for(Need need: needs){
                 JProgressBar p = needBars.get(person.name+","+need.name());
                 p.setValue((int) need.getValue());

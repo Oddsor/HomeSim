@@ -9,7 +9,7 @@ import java.util.ArrayList;
  *
  * @author Odd
  */
-class SimulationMap {
+public class SimulationMap {
     /**
     * Can move approx 50 pixels in appsketch.jpg-image.
     */
@@ -18,7 +18,7 @@ class SimulationMap {
     public final String mapName;
     public final int startNodeId;
     
-    private ArrayList<Node> nodes;
+    private final ArrayList<Node> nodes;
     public ArrayList<HouseObject> objects;
     
     public SimulationMap(String mapName, int walkingDistancePerSec, int startId, SQLiteConnection db){

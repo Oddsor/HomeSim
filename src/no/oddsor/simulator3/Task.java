@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * @author Odd
  */
-class Task {
+public class Task {
 
     NeedType fulfilledNeed;
     int fulfilledAmount;
@@ -34,7 +34,8 @@ class Task {
     String taskName;
     int durationSeconds;
 
-    public Task(String taskName, int durationSeconds, int[] blockedDays, int startTime, int endTime, ObjectTypes... performedAtObjects) {
+    public Task(String taskName, int durationSeconds, int[] blockedDays, 
+            int startTime, int endTime, ObjectTypes... performedAtObjects) {
         this.taskName = taskName;
         this.durationSeconds = durationSeconds;
         this.blockedDays = blockedDays;
@@ -69,23 +70,22 @@ class Task {
     }
     
     public Collection<HouseObject> getViableObjects(Collection<HouseObject> allObjects){
-        Collection<HouseObject> objects = new ArrayList<>();
+        Collection<HouseObject> viableObjects = new ArrayList<>();
         if(performedAt != null){
             for (ObjectTypes performedAt1 : performedAt) {
                 for (HouseObject obj : allObjects) {
                     if (performedAt1 == obj.type) {
-                        Set<Item> items = requiredObjectInventory.keySet();
-                        Iterator<Item> it = items.iterator();
+                        Iterator<Item> it = requiredObjectInventory.keySet().iterator();
+                        boolean fulfilled = true;
                         while(it.hasNext()){
-                            if(!obj.hasItem(it.next())) continue;
-                        
-                            objects.add(obj);
+                            if(!obj.hasItem(it.next())) fulfilled = false;
                         }
+                        if(fulfilled) viableObjects.add(obj);
                     }
                 }
             }
         }else System.out.println("Task " + taskName + " cannot be performed anywhere?");
-        return objects;
+        return viableObjects;
     }
     
     public boolean taskAvailable(int day, int hour){
@@ -107,14 +107,15 @@ class Task {
         while(it.hasNext()){
             Item item = it.next();
             if(!p.hasItem(item)){
-                System.out.println("Person has " + item.name());
+                System.out.println("Person doesn't have has " + item.name());
                 return false;
             }
         }
         for(HouseObject obj: viableObjects){
-            Iterator it2 = requiredObjectInventory.keySet().iterator();
+            Iterator<Item> it2 = requiredObjectInventory.keySet().iterator();
             while(it.hasNext()){
-                if(!obj.hasItem((Item) it2.next())) return false;
+                Item objectItem = it2.next();
+                if(obj.hasItem(objectItem)) return false;
             }
         }
         return true;

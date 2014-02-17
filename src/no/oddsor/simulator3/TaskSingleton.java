@@ -18,6 +18,7 @@ public class TaskSingleton {
     ArrayList<Task> tasks;
     
     private TaskSingleton(){
+        
         tasks = new ArrayList<>();
         Task getIngredients = new Task("Get ingredients from fridge", 10, null, 0, 0, ObjectTypes.REFRIDGERATOR);
         getIngredients.addResultingItem(true, Item.RAW_FOOD, 1);
@@ -40,11 +41,11 @@ public class TaskSingleton {
         tasks.add(sleep);
         
         Task washHands = new Task("Wash hands", 30, null, 0, 0, ObjectTypes.SINK);
-        washHands.addResult(NeedType.TOILET, 100);
         washHands.addRequiredItem(true, Item.DIRTY_HANDS, 1);
         tasks.add(washHands);
         
         Task useToilet = new Task("Use toilet", 120, null, 0, 0, ObjectTypes.TOILET);
+        useToilet.addResult(NeedType.TOILET, 100);
         useToilet.addResultingItem(true, Item.DIRTY_HANDS, 1);
         tasks.add(useToilet);
     }
