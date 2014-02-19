@@ -80,7 +80,6 @@ public class Person implements Entity{
                 }
                 if(!inUse)nodes.add(object.getLocation());
             }
-            System.out.println(nodes.size());
             try {
                 route = AStarMulti.getRoute(nodes, map.getClosestNode(currentLocation));
                 if(!route.isEmpty()){
@@ -101,9 +100,16 @@ public class Person implements Entity{
     void passTime(double seconds) {
         if(getRoute() == null){
             taskCount -= seconds;
-            if(taskCount <= 0.0){
-                //TODO transactions
+            if(taskCount < 0.0){
+                if(currentTask != null && currentTask.fulfilledNeed != null){
+                    for(Need need: needs){
+                        if(need.type() == currentTask.fulfilledNeed){
+                            need.increaseValue(currentTask.fulfilledAmount);
+                        }
+                    }
+                }
                 currentTask = null;
+                usingObject = null;
             }
         }
         for(Need need: needs){

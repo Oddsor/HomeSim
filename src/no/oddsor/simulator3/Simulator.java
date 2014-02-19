@@ -4,10 +4,8 @@ package no.oddsor.simulator3;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 
 /**
  *
@@ -18,7 +16,6 @@ public class Simulator {
     Collection<Person> people;
     SimulationMap map;
     ArrayList<Task> tasks;
-    //Set<Node> blockedNodes;
     
     int simsPerSec;
     int walkingSpeed;
@@ -37,7 +34,6 @@ public class Simulator {
         this.simsPerSec = simulationsPerSec;
         this.time = new Time(0);
         this.currentTime = 0;
-        //this.blockedNodes = new HashSet<>();
         this.walkingSpeed = (int) (map.walkingSpeedPerSec / simsPerSec);
         this.tasks = TaskSingleton.getTaskList();
     }
@@ -62,7 +58,6 @@ public class Simulator {
         double distance = p.distance(targetLocation);
         int dx = targetLocation.x - p.x;
         int dy = targetLocation.y - p.y;
-        System.out.println("DX: " + dx + ", DY:" + dy + ", Distance: " + distance);
         if(distance < walkingSpeed) p.setLocation(targetLocation);
         else{
             p.translate((int) (walkingSpeed * (dx / distance)), 
