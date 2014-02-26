@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import no.oddsor.simulator2.db_tables.Edge;
-import no.oddsor.simulator2.db_tables.Node;
 
 /**
  *

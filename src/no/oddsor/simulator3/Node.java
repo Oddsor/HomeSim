@@ -97,6 +97,17 @@ public class Node extends AbstractTable implements AStarNode{
         }
     }
     
+    public static void createTable(SQLiteConnection db){
+        try {
+            db.exec("CREATE TABLE IF NOT EXISTS node (" +
+"room INT, id INTEGER PRIMARY KEY, x INT, y INT);");
+            db.exec("CREATE TABLE IF NOT EXISTS node_objects (id INTEGER PRIMARY KEY, " + 
+                    "nodeid INTEGER, type VARCHAR(45));");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    
     public void addObject(ObjectTypes type){
         if(types.add(new HouseObject(type, this))){
             update();

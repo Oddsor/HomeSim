@@ -38,17 +38,24 @@ public class Simulator {
         this.tasks = TaskSingleton.getTaskList();
     }
     
-    public void simulationStep(){
+    /**
+     * 
+     * @return True if any player moved
+     */
+    public boolean simulationStep(){
+        boolean movement = false;
         for(Person person: people){
             Queue<Node> route = person.getRoute();
             if(route != null){ //We're traveling!
                 person.setLocation(moveToPoint(person.currentLocation(), route.peek()));
+                movement = true;
             }else if(person.getTask() == null){ //TODO else if not doing target task, do task
                 person.setTask(getNextTask(person), map);
             }
             person.passTime(1.0/simsPerSec);
         }
         currentTime += (1.0/simsPerSec);
+        return movement;
     }
     
     //TODO verify
