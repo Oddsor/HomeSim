@@ -9,13 +9,15 @@ import no.oddsor.simulator3.enums.Item;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *
  * @author Odd
  */
 public class Task {
+    
+    public static boolean BREAK_POINT = true;
+    public static boolean FLOAT_THROUGH = false;
 
     NeedType fulfilledNeed;
     int fulfilledAmount;
@@ -25,7 +27,7 @@ public class Task {
     
     Map<Item, Integer> requiredPersonInventory;
     Map<Item, Integer> resultingPersonInventory;
-    
+    private boolean breakPoint;
     public ObjectTypes[] performedAt;
     public int[] blockedDays;
     public int startTime;
@@ -35,7 +37,9 @@ public class Task {
     int durationSeconds;
 
     public Task(String taskName, int durationSeconds, int[] blockedDays, 
-            int startTime, int endTime, ObjectTypes... performedAtObjects) {
+            int startTime, int endTime, boolean breakpoint, 
+            ObjectTypes... performedAtObjects) {
+        this.breakPoint = breakpoint;
         this.taskName = taskName;
         this.durationSeconds = durationSeconds;
         this.blockedDays = blockedDays;
@@ -107,7 +111,6 @@ public class Task {
         while(it.hasNext()){
             Item item = it.next();
             if(!p.hasItem(item)){
-                System.out.println("Person doesn't have has " + item.name());
                 return false;
             }
         }

@@ -24,6 +24,11 @@ class Need {
         if(value < 0) value = 0;
     }
     
+    public void increaseValue(int amount){
+        value += amount;
+        if(value > 100.0) value = 100.0;
+    }
+    
     public double getValue(){
         return value;
     }
