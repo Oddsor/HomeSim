@@ -1,0 +1,86 @@
+{
+    "Automatic":{ "Name": "Wash clothes",
+        "Appliance": "WashingMachine",
+        "Duration": 120,
+        "Requires": ["Laundry", 10],
+        "Creates": "WashedLaundry"
+    },
+    "Automatic":{ "Name": "Dry laundry",
+        "Appliance": "Tumbler",
+        "Duration": 120,
+        "Requires": "WashedLaundry",
+        "Creates": "DryLaundry"
+    },
+    "Finite":{ "Name": "Place laundry",
+        "Appliance": "Closet",
+        "Requires": "DryLaundry"
+    },
+    "Infinite":{ "Name": "Watch TV",
+        "Appliance": "Sofa",
+        "IncreasesNeed": ["Fun", 5]
+    },
+    "Scheduled":{ "Name": "Go to work",
+        "Appliance": "Outside",
+        "Timespan": [8, 14]
+    },
+    "Finite":{ "Name": "Make dinner",
+        "Timespan": [16,20],
+        "Appliance": "Oven",
+        "Duration": 5,
+        "Requires": "Ingredients",
+        "Creates": ["Food", 3]
+    },
+    "Finite":{ "Name": "Make food",
+        "Appliance": "Bench",
+        "Requires": "Ingredients",
+        "Duration": 2,
+        "Timespan": [20,16],
+        "Creates": "Food"
+    },
+    "Finite":{ "Name": "Eat food",
+        "Appliance": "Chair",
+        "Duration": 10,
+        "Requires": ["Food", "Cutlery", "Glass", "Plate"],
+        "Creates": ["DirtyDishes", "KitchenSink"],
+        "IncreasesNeed": ["Hunger", 100]
+    },
+    "Automatic":{ "Name": "Start dishwasher",
+        "Appliance": "Dishwasher",
+        "Requires": ["DirtyDishes", 10]
+    },
+    "Finite":{ "Name": "Shower",
+        "Appliance": "Shower",
+        "IncreasesNeed": ["Hygiene", 100],
+        "Creates": ["Laundry", "LaundryBasket"]
+    },
+    "Finite":{ "Name": "Go to the toilet",
+        "Appliance": "Toilet",
+        "IncreasesNeed": ["Bladder", 100]
+    },
+    "Infinite":{ "Name": "Read book",
+        "Appliance": "Sofa",
+        "IncreasesNeed": ["Fun", 5],
+        "Timespan": [9, 23],
+        "Requires": "Book"
+    },
+    "Finite":{ "Name": "Go to store",
+        "Timespan": [9, 23],
+        "Appliance": "Outside",
+        "Creates": "Wares"
+    },
+    "Finite":{ "Name": "Restock fridge",
+        "Appliance": "Refridgerator",
+        "Requires": "Wares",
+        "Creates": ["Ingredients", 15]
+    },
+    "Infinite":{ "Name": "Sleep",
+        "Appliance": "Bed",
+        "Timespan": [23,7],
+        "IncreasesNeed": ["Energy", 5]
+    },
+    "Infinite":{ "Name": "Use PC",
+        "Appliance": "PC",
+        "Timespan": [9, 23],
+        "IncreasesNeed": ["Fun", 5]
+    }
+}
