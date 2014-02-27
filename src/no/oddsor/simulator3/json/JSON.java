@@ -29,10 +29,10 @@ public class JSON {
         this.object = (JSONObject)jp.parse(new FileReader("tasks.json"));
     }
     
-/*    public Collection<Task> getTasks(){
+    public Collection<Task> getTasks(){
         Collection<Task> tasks = new  ArrayList<>();
         return null;
-    }*/
+    }
     
     public Set<String> getAppliances(){
         Set<String> appliances = new HashSet<>();

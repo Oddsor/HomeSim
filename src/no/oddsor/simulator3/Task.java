@@ -12,18 +12,14 @@ import java.util.Map;
  * @author Odd
  */
 public class Task {
-    
-    public static boolean BREAK_POINT = true;
-    public static boolean FLOAT_THROUGH = false;
 
     String fulfilledNeed;
     int fulfilledAmount;
     
-    Map<String, Integer> requiredObjectInventory;
-    Map<String, Integer> resultingObjectInventory;
+    Map<String, Integer> requiredItem;
+    Map<String, Integer> resultingItem;
     
     Map<String, Integer> requiredPersonInventory;
-    Map<String, Integer> resultingPersonInventory;
     public String[] performedAt;
     public int[] blockedDays;
     public int startTime;
@@ -43,28 +39,20 @@ public class Task {
         fulfilledNeed = null;
         fulfilledAmount = -1;
         
-        requiredObjectInventory = new HashMap<>();
-        resultingObjectInventory = new HashMap<>();
+        resultingItem = new HashMap<>();
         requiredPersonInventory = new HashMap<>();
-        resultingPersonInventory = new HashMap<>();
     }
     
-    public void addResult(NeedType need, int amount){
+    public void addResult(String need, int amount){
         fulfilledNeed = need;
         fulfilledAmount = amount;
     }
     
-    public void addRequiredItem(boolean person, Item item, int amount){
-        if(person) requiredPersonInventory.put(item, amount);
-        requiredObjectInventory.put(item, amount);
+    public void addRequiredItem(String item, int amount){
+        requiredItem.put(item, amount);
     }
-    public void addResultingItem(boolean person, Item item, int amount){
-        if(person) resultingPersonInventory.put(item, amount);
-        else resultingObjectInventory.put(item, amount);
-    }
-    
-    public void finishTransaction(Person p, HouseObject h){
-        
+    public void addResultingItem(boolean person, String item, int amount){
+        resultingItem.put(item, amount);
     }
     
     public Collection<HouseObject> getViableObjects(Collection<HouseObject> allObjects){
