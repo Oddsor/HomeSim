@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- *
+ * An implementation of a map. Players move on an screencap of an apartment's
+ * layout via a node network.
  * @author Odd
  */
 public class SimulationMap {
@@ -55,5 +56,21 @@ public class SimulationMap {
     
     public Collection<Person> getPeople(){
         return people;
+    }
+    
+    public Point moveActor(Person person, int simulationsPerSec){
+        int walkingSpeed = (int) (walkingSpeedPerSec / simulationsPerSec);
+        Point p = new Point(person.currentLocation());
+        Node targetNode = person.getRoute().peek();
+        Point targetLocation = targetNode.getLocation();
+        double distance = p.distance(targetLocation);
+        int dx = targetLocation.x - p.x;
+        int dy = targetLocation.y - p.y;
+        if(distance < walkingSpeed) p.setLocation(targetLocation);
+        else{
+            p.translate((int) (walkingSpeed * (dx / distance)), 
+                    (int) (walkingSpeed * (dy / distance)));
+        }
+        return p;
     }
 }

@@ -1,7 +1,6 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator2.db_tables.*;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import java.util.Iterator;

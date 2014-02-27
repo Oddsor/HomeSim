@@ -3,9 +3,6 @@ package no.oddsor.simulator3;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import no.oddsor.simulator3.enums.NeedType;
-import no.oddsor.simulator3.enums.ObjectTypes;
-import no.oddsor.simulator3.enums.Item;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,16 +16,15 @@ public class Task {
     public static boolean BREAK_POINT = true;
     public static boolean FLOAT_THROUGH = false;
 
-    NeedType fulfilledNeed;
+    String fulfilledNeed;
     int fulfilledAmount;
     
-    Map<Item, Integer> requiredObjectInventory;
-    Map<Item, Integer> resultingObjectInventory;
+    Map<String, Integer> requiredObjectInventory;
+    Map<String, Integer> resultingObjectInventory;
     
-    Map<Item, Integer> requiredPersonInventory;
-    Map<Item, Integer> resultingPersonInventory;
-    private boolean breakPoint;
-    public ObjectTypes[] performedAt;
+    Map<String, Integer> requiredPersonInventory;
+    Map<String, Integer> resultingPersonInventory;
+    public String[] performedAt;
     public int[] blockedDays;
     public int startTime;
     public int endTime;
@@ -37,9 +33,7 @@ public class Task {
     int durationSeconds;
 
     public Task(String taskName, int durationSeconds, int[] blockedDays, 
-            int startTime, int endTime, boolean breakpoint, 
-            ObjectTypes... performedAtObjects) {
-        this.breakPoint = breakpoint;
+            int startTime, int endTime, String... performedAtObjects) {
         this.taskName = taskName;
         this.durationSeconds = durationSeconds;
         this.blockedDays = blockedDays;

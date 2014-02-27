@@ -18,4 +18,8 @@ public interface ITask {
     public boolean itemsExist(SimulationMap map);
     
     public Object[] getRequiredItems();
+    
+    public void progressTask(double seconds);
+    
+    public double remainingDuration();
 }

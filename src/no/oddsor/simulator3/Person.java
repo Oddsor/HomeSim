@@ -1,7 +1,6 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.enums.Item;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -14,23 +13,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import net.oddsor.AStarMulti.AStarMulti;
-import no.oddsor.simulator3.enums.NeedType;
 
 /**
  *
  * @author Odd
  */
-public class Person implements Entity{
+public class Person{
 
     private Point currentLocation;
     private Deque<Node> route;
     private final List<Need> needs;
-    private Task currentTask;
+    private ITask currentTask;
     private HouseObject usingObject;
     private double taskCount;
     public final String name;
     
-    private final HashMap<Item, Integer> inventory;
+    private final HashMap<String, Integer> inventory;
     public Image avatarImg;
     
     public Person(String name, String avatarImage, Point currentLocation){
@@ -38,10 +36,10 @@ public class Person implements Entity{
         this.currentLocation = currentLocation;
         this.avatarImg = new ImageIcon(getClass().getResource(avatarImage)).getImage();
         needs = new ArrayList<>();
-        NeedType[] needlist = NeedType.values();
-        for (NeedType needlist1 : needlist) {
+        //String[] needlist = new String[2];
+        /*for (String needlist1 : needlist) {
             needs.add(new Need(needlist1, 100.0));
-        }
+        }*/
         inventory = new HashMap<>();
     }
     
@@ -66,7 +64,7 @@ public class Person implements Entity{
         return needs;
     }
 
-    void setTask(Task nextTask, SimulationMap map) {
+/*    void setTask(Task nextTask, SimulationMap map) {
         if(nextTask != null){
             currentTask = nextTask;
             taskCount = currentTask.durationSeconds;
@@ -91,51 +89,15 @@ public class Person implements Entity{
                 Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }
+    }*/
     
-    public Task getTask(){
+    public ITask getTask(){
         return currentTask;
     }
 
     void passTime(double seconds) {
-        if(getRoute() == null){
-            taskCount -= seconds;
-            if(taskCount < 0.0){
-                if(currentTask != null && currentTask.fulfilledNeed != null){
-                    for(Need need: needs){
-                        if(need.type() == currentTask.fulfilledNeed){
-                            need.increaseValue(currentTask.fulfilledAmount);
-                        }
-                    }
-                }
-                currentTask = null;
-                usingObject = null;
-            }
-        }
         for(Need need: needs){
             need.deteriorate(seconds);
         }
-    }
-
-    @Override
-    public boolean hasItem(Item item) {
-        return inventory.containsKey(item);   
-    }
-
-    @Override
-    public void removeItem(Item item, int amount) {
-        inventory.put(item, getAmountOfItem(item) - amount);
-    }
-
-    @Override
-    public void addItem(Item item, int amount) {
-        inventory.put(item, getAmountOfItem(item) + amount);
-    }
-
-    @Override
-    public int getAmountOfItem(Item item) {
-        int amount = 0;
-        if(inventory.get(item) != null) amount = inventory.get(item);
-        return amount;
     }
 }

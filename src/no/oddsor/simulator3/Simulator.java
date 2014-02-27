@@ -1,7 +1,6 @@
 
 package no.oddsor.simulator3;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +17,6 @@ public class Simulator {
     ArrayList<Task> tasks;
     
     int simsPerSec;
-    int walkingSpeed;
     public Time time;
     public double currentTime;
     
@@ -34,7 +32,6 @@ public class Simulator {
         this.simsPerSec = simulationsPerSec;
         this.time = new Time(0);
         this.currentTime = 0;
-        this.walkingSpeed = (int) (map.walkingSpeedPerSec / simsPerSec);
         this.tasks = TaskSingleton.getTaskList();
     }
     
@@ -47,30 +44,18 @@ public class Simulator {
         for(Person person: people){
             Queue<Node> route = person.getRoute();
             if(route != null){ //We're traveling!
-                person.setLocation(moveToPoint(person.currentLocation(), route.peek()));
+                person.setLocation(map.moveActor(person, simsPerSec));
                 movement = true;
-            }else if(person.getTask() == null){ //TODO else if not doing target task, do task
-                person.setTask(getNextTask(person), map);
+            }else if(person.getTask() != null){ //TODO else if not doing target task, do task
+                person.getTask().progressTask(1.0/simsPerSec);
+                if(person.getTask().remainingDuration() <= 0.0) person.setTask(null);
+            }else{
+                person.setTask(taskmanager.findTask(person, map, time));
             }
             person.passTime(1.0/simsPerSec);
         }
         currentTime += (1.0/simsPerSec);
         return movement;
-    }
-    
-    //TODO verify
-    private Point moveToPoint(Point currentLocation, Node targetNode){
-        Point p = new Point(currentLocation);
-        Point targetLocation = targetNode.getLocation();
-        double distance = p.distance(targetLocation);
-        int dx = targetLocation.x - p.x;
-        int dy = targetLocation.y - p.y;
-        if(distance < walkingSpeed) p.setLocation(targetLocation);
-        else{
-            p.translate((int) (walkingSpeed * (dx / distance)), 
-                    (int) (walkingSpeed * (dy / distance)));
-        }
-        return p;
     }
     
     private Task getNextTask(Person p){
@@ -80,7 +65,7 @@ public class Simulator {
         for(Need need: needs){
             if(need.getValue() > 60) continue;
             for(Task fTask: goalTasks){
-                if(fTask.fulfilledNeed != null && fTask.fulfilledNeed == need.type() 
+                if(fTask.fulfilledNeed != null && fTask.fulfilledNeed.equals(need.name()) 
                         && fTask.completable(p, map.objects)){
                     task = fTask;
                 }

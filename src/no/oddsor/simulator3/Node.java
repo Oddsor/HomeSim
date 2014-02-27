@@ -1,7 +1,6 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.enums.ObjectTypes;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
@@ -21,8 +20,9 @@ public class Node extends AbstractTable implements AStarNode{
     private Point location;
     private final Collection<Node> neighbours;
     public ArrayList<HouseObject> types;
+    private Room room;
 
-    public Node(SQLiteConnection db, int id, Point location) throws SQLiteException {
+    public Node(SQLiteConnection db, int id, Point location, Room room) throws SQLiteException {
         super(db, id, tableName, null);
         this.location = location;
         this.neighbours = new ArrayList<>();
@@ -61,7 +61,7 @@ public class Node extends AbstractTable implements AStarNode{
             }
             db.exec("DELETE FROM node_objects WHERE nodeid = " + id);
             for(HouseObject type: types){
-                db.exec("INSERT INTO node_objects VALUES(null, " + id + ", '" + type.type + "');");
+                db.exec("INSERT INTO node_objects VALUES(null, " + id + ", '" + type.type() + "');");
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -73,12 +73,13 @@ public class Node extends AbstractTable implements AStarNode{
         try{
             SQLiteStatement st = db.prepare("SELECT * FROM node");
             while (st.step()){
-                Node nod = new Node(db, st.columnInt(0), 
-                        new Point(st.columnInt(1), st.columnInt(2)));
+                Node nod = new Node(db, st.columnInt(1), 
+                        new Point(st.columnInt(2), st.columnInt(3)), 
+                        Room.getRoom(st.columnInt(0), db));
                 ArrayList<HouseObject> types = new ArrayList<>();
-                SQLiteStatement st2 = db.prepare("SELECT * FROM node_objects WHERE nodeid = " + st.columnInt(0) + ";");
+                SQLiteStatement st2 = db.prepare("SELECT * FROM node_objects WHERE nodeid = " + st.columnInt(1) + ";");
                 while(st2.step()){
-                    types.add(new HouseObject(ObjectTypes.valueOf(st2.columnString(2)), nod));
+                    types.add(new HouseObject(st2.columnString(2), nod));
                 }
                 nod.types = types;
                 nodes.add(nod);
@@ -108,15 +109,15 @@ public class Node extends AbstractTable implements AStarNode{
         }
     }
     
-    public void addObject(ObjectTypes type){
+    public void addObject(String type){
         if(types.add(new HouseObject(type, this))){
             update();
         }
     }
     
-    public void removeObject(ObjectTypes type){
+    public void removeObject(String type){
         for(HouseObject obj: types){
-            if(obj.type == type){
+            if(obj.type.equals(type)){
                 types.remove(obj);
                 update();
             }

@@ -1,21 +1,20 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.enums.NeedType;
-
 /**
  *
  * @author Odd
  */
 class Need {
     
-    private NeedType type;
+    private String type;
     private int deteriorationRate;
     private double value;
     
-    public Need(NeedType type, double value){
+    public Need(String type, double value){
         this.type = type;
-        this.deteriorationRate = type.deteriorationRate;
+        //TODO add deteriorationrate
+        this.deteriorationRate = 1;
         this.value = value;
     }
     
@@ -34,10 +33,7 @@ class Need {
     }
     
     public String name(){
-        return type.name();
-    }
-    
-    public NeedType type(){
         return type;
     }
+    
 }

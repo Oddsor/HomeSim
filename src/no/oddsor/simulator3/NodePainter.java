@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 import javax.swing.JPanel;
@@ -183,7 +185,11 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
             }
         }else if(hoveredPoint != null){
             selectedPoint = hoveredPoint;
-            simFrame.setActiveNode(selectedPoint);
+            try {
+                simFrame.setActiveNode(selectedPoint);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }else if(hoveredPoint != null && draggingPoint){
             hoveredPoint.update();
         }else if(arg0.getButton() == MouseEvent.BUTTON3 && selectedPoint != null){
@@ -191,7 +197,7 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
         }
         else if(arg0.getButton() == MouseEvent.BUTTON3 && selectedPoint == null){
             try{
-                Node nod = new Node(db, -1, new Point(arg0.getX(), arg0.getY()));
+                Node nod = new Node(db, -1, new Point(arg0.getX(), arg0.getY()), null);
                 nod.update();
                 points.add(nod);
             }catch(Exception e){
