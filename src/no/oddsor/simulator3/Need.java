@@ -5,7 +5,7 @@ package no.oddsor.simulator3;
  *
  * @author Odd
  */
-class Need {
+public class Need implements Comparable<Need>{
     
     private String type;
     private int deteriorationRate;
@@ -34,6 +34,11 @@ class Need {
     
     public String name(){
         return type;
+    }
+
+    @Override
+    public int compareTo(Need t) {
+        return (int) (this.value - t.value);
     }
     
 }

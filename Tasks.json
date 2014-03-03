@@ -19,20 +19,23 @@
 		{
 			"Name": "Place laundry",
 			"Type": "Finite",
+			"Duration": 1,
 			"Appliance": "Closet",
 			"Requires": "DryLaundry"
 		},
 		{
 			"Name": "Watch TV",
 			"Type": "Infinite",
+			"Duration": -1,
 			"Appliance": "Sofa",
 			"IncreasesNeed": ["Fun", 5]
 		},
 		{
 			"Name": "Go to work",
 			"Type": "Scheduled",
+			"Duration": 240,
 			"Appliance": "Outside",
-			"Timespan": [8, 14]
+			"Timespan": [8, 10]
 		},
 		{
 			"Name": "Make dinner",
@@ -41,7 +44,7 @@
 			"Appliance": "Oven",
 			"Duration": 5,
 			"Requires": "Ingredients",
-			"Creates": ["Food", 3]
+			"Creates": ["Food", 2]
 		},
 		{
 			"Name": "Make food",
@@ -57,22 +60,24 @@
 			"Type": "Finite",
 			"Appliance": "Chair",
 			"Duration": 10,
-			"Requires": ["Food", "Cutlery", "Glass", "Plate"],
-			"Creates": ["DirtyDishes", "KitchenSink"],
+			"Requires": ["Food", "Utensils", "Plate"],
+			"Creates": "DirtyDishes",
 			"IncreasesNeed": ["Hunger", 100]
 		},
 		{
 			"Name": "Start dishwasher",
 			"Type": "Automatic",
+			"Duration": 1,
 			"Appliance": "Dishwasher",
 			"Requires": ["DirtyDishes", 10]
 		},
 		{
 			"Name": "Shower",
 			"Type": "Finite",
+			"Duration": 5,
 			"Appliance": "Shower",
 			"IncreasesNeed": ["Hygiene", 100],
-			"Creates": ["Laundry", "LaundryBasket"]
+			"Creates": "Laundry"
 		},
 		{ 
 			"Name": "Go to the toilet",
@@ -84,6 +89,7 @@
 		{
 			"Name": "Read book",
 			"Type": "Infinite",
+			"Duration": -1,
 			"Appliance": "Sofa",
 			"IncreasesNeed": ["Fun", 5],
 			"Timespan": [9, 23],
@@ -92,7 +98,7 @@
 		{
 			"Name": "Find book",
 			"Type": "Finite",
-			"Duration": 0.5,
+			"Duration": 1,
 			"Appliance": "Bookshelf",
 			"Creates": "Book"
 		},
@@ -115,6 +121,7 @@
 		{
 			"Name": "Sleep",
 			"Type": "Infinite",
+			"Duration": -1,
 			"Appliance": "Bed",
 			"Timespan": [23,7],
 			"IncreasesNeed": ["Energy", 5]
@@ -122,9 +129,24 @@
 		{
 			"Name": "Use PC",
 			"Type": "Infinite",
+			"Duration": -1,
 			"Appliance": "PC",
 			"Timespan": [9, 23],
 			"IncreasesNeed": ["Fun", 5]
+		},
+		{
+			"Name": "Find plate",
+			"Type": "Finite",
+			"Duration": 0,
+			"Appliance": "Cabinet",
+			"Creates": "Plate"
+		},
+		{
+			"Name": "Find utensils",
+			"Type": "Finite",
+			"Duration": 0,
+			"Appliance": "Drawer",
+			"Creates": "Utensils"
 		}
 	],
 	"People":[

@@ -23,6 +23,7 @@ public class SimulationMap {
     private final ArrayList<Node> nodes;
     private final Collection<Person> people;
     public ArrayList<HouseObject> objects;
+    public Collection<Item> items;
     
     public SimulationMap(String mapName, int walkingDistancePerSec, int startId, 
             Collection<Person> people, SQLiteConnection db){
@@ -39,6 +40,7 @@ public class SimulationMap {
                 }
             }
         }
+        this.items = new ArrayList<>();
     }
 
     public Node getClosestNode(Point start) {
@@ -72,5 +74,27 @@ public class SimulationMap {
                     (int) (walkingSpeed * (dy / distance)));
         }
         return p;
+    }
+    
+    public void addItem(Item item){
+        this.items.add(item);
+    }
+    
+    public Item popItem(String itemName, Node location){
+        for(Item item: items){
+            if(location.id == item.location.id && item.name.equals(itemName)){
+                items.remove(item);
+                return item;
+            }
+        }
+        return null;
+    }
+    
+    public boolean hasItem(String requestedItem, int amount){
+        int count = 0;
+        for(Item item: items){
+            if(item.name.equals(requestedItem)) count++;
+        }
+        return count >= amount;
     }
 }

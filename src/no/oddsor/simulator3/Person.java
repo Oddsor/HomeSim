@@ -4,15 +4,11 @@ package no.oddsor.simulator3;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import net.oddsor.AStarMulti.AStarMulti;
 
 /**
  *
@@ -27,24 +23,37 @@ public class Person{
     private HouseObject usingObject;
     private double taskCount;
     public final String name;
+    private double fetchTime;
+    private double remainingTaskDuration;
+    
+    public String targetItem;
     
     private final HashMap<String, Integer> inventory;
     public Image avatarImg;
+    private ITask goalTask;
     
     public Person(String name, String avatarImage, Point currentLocation){
         this.name = name;
         this.currentLocation = currentLocation;
         this.avatarImg = new ImageIcon(getClass().getResource(avatarImage)).getImage();
         needs = new ArrayList<>();
-        //String[] needlist = new String[2];
-        /*for (String needlist1 : needlist) {
-            needs.add(new Need(needlist1, 100.0));
-        }*/
         inventory = new HashMap<>();
     }
     
     Point currentLocation() {
         return currentLocation;
+    }
+    
+    public void addItem(Item item){
+        inventory.put(item.name, (inventory.get(item.name) != null ? 
+                inventory.get(item.name) : 0) + 1);
+    }
+    
+    public boolean hasItem(String item, int amount){
+        if(inventory.containsKey(item)){
+            if(inventory.get(item) >= amount) return true;
+        }
+        return false;
     }
 
     Queue<Node> getRoute() {
@@ -62,6 +71,30 @@ public class Person{
     
     public List<Need> getNeeds(){
         return needs;
+    }
+    
+    public void setCurrentTask(ITask task){
+        this.currentTask = task;
+        this.remainingTaskDuration = task.getDurationSeconds();
+    }
+    
+    public double remainingDuration(){
+        return remainingTaskDuration;
+    }
+    
+    public void progressTask(double seconds){
+        remainingTaskDuration -= seconds;
+    }
+    
+    public ITask getGoalTask(){
+        return goalTask;
+    }
+    public void setGoalTask(ITask task){
+        this.goalTask = task;
+    }
+    
+    public void setRoute(Deque<Node> route){
+        this.route = route;
     }
 
 /*    void setTask(Task nextTask, SimulationMap map) {
@@ -91,13 +124,27 @@ public class Person{
         }
     }*/
     
-    public ITask getTask(){
+    public ITask getCurrentTask(){
         return currentTask;
+    }
+    
+    public void setTargetItem(String itemName){
+        this.targetItem = itemName;
+        fetchTime = 2.0;
+    }
+    
+    public String getTargetItem(){
+        return targetItem;
     }
 
     void passTime(double seconds) {
         for(Need need: needs){
             need.deteriorate(seconds);
         }
+        fetchTime -= seconds;
+    }
+    
+    public double getFetchTime(){
+        return fetchTime;
     }
 }

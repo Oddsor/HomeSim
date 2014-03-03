@@ -6,6 +6,10 @@
 
 package no.oddsor.simulator3;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author Odd
@@ -13,13 +17,15 @@ package no.oddsor.simulator3;
 public interface ITask {
     public String fulfilledNeed();
     
-    public boolean available(Time time);
+    public boolean available(double time);
     
     public boolean itemsExist(SimulationMap map);
     
-    public Object[] getRequiredItems();
+    public boolean personHasAllItems(Person person);
     
-    public void progressTask(double seconds);
+    public Collection<HouseObject> getViableAppliances(Collection<HouseObject> allAppliances);
     
-    public double remainingDuration();
+    public Map<String, Integer> getRequiredItems();
+    
+    public double getDurationSeconds();
 }

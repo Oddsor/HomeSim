@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
  *
  * @author Odd
  */
-public class Task {
+public class Task implements ITask{
 
     String fulfilledNeed;
     int fulfilledAmount;
@@ -19,28 +20,34 @@ public class Task {
     Map<String, Integer> requiredItem;
     Map<String, Integer> resultingItem;
     
-    Map<String, Integer> requiredPersonInventory;
-    public String[] performedAt;
-    public int[] blockedDays;
     public int startTime;
     public int endTime;
     
     String taskName;
-    int durationSeconds;
+    int durationMinutes;
+    double remainingSeconds;
+    List<HouseObject> performedAt;
+    String type;
 
-    public Task(String taskName, int durationSeconds, int[] blockedDays, 
-            int startTime, int endTime, String... performedAtObjects) {
+    public Task(String taskName, String type, int durationMinutes, List<HouseObject> performedAt) {
         this.taskName = taskName;
-        this.durationSeconds = durationSeconds;
-        this.blockedDays = blockedDays;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.performedAt = performedAtObjects;
+        this.type = type;
+        this.durationMinutes = durationMinutes;
+        this.remainingSeconds = (double) (durationMinutes * 60);
+        this.startTime = -1;
+        this.endTime = -1;
+        this.performedAt = performedAt;
         fulfilledNeed = null;
         fulfilledAmount = -1;
-        
         resultingItem = new HashMap<>();
-        requiredPersonInventory = new HashMap<>();
+        requiredItem = new HashMap<>();
+    }
+    
+    public Task(String taskName, String type, int durationSeconds,
+            int startTime, int endTime, List<HouseObject> performedAt) {
+        this(taskName, type, durationSeconds, performedAt);
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
     
     public void addResult(String need, int amount){
@@ -51,17 +58,18 @@ public class Task {
     public void addRequiredItem(String item, int amount){
         requiredItem.put(item, amount);
     }
-    public void addResultingItem(boolean person, String item, int amount){
+    public void addResultingItem(String item, int amount){
         resultingItem.put(item, amount);
     }
     
-    public Collection<HouseObject> getViableObjects(Collection<HouseObject> allObjects){
+    @Override
+    public Collection<HouseObject> getViableAppliances(Collection<HouseObject> allObjects){
         Collection<HouseObject> viableObjects = new ArrayList<>();
         if(performedAt != null){
-            for (ObjectTypes performedAt1 : performedAt) {
+            for (HouseObject appliance : performedAt) {
                 for (HouseObject obj : allObjects) {
-                    if (performedAt1 == obj.type) {
-                        Iterator<Item> it = requiredObjectInventory.keySet().iterator();
+                    if (appliance.type.equals(obj.type)) {
+                        Iterator<String> it = requiredItem.keySet().iterator();
                         boolean fulfilled = true;
                         while(it.hasNext()){
                             if(!obj.hasItem(it.next())) fulfilled = false;
@@ -75,11 +83,6 @@ public class Task {
     }
     
     public boolean taskAvailable(int day, int hour){
-        if(blockedDays != null){
-            for(int i = 0; i < blockedDays.length; i++){
-                if(blockedDays[i] == day) return false;
-            }
-        }
         if(startTime == 0 && endTime == 0) return true;
         int newEnd = (endTime - startTime) % 24;
         int newCurrent = (hour - startTime) % 24;
@@ -87,21 +90,51 @@ public class Task {
         return newCurrent <= newEnd;
     }
     
-    public boolean completable(Person p, ArrayList<HouseObject> allObjects){
-        Collection<HouseObject> viableObjects = getViableObjects(allObjects);
-        Iterator<Item> it = requiredPersonInventory.keySet().iterator();
+    public boolean completable(Person p, SimulationMap map){
+        Iterator<String> it = requiredItem.keySet().iterator();
         while(it.hasNext()){
-            Item item = it.next();
-            if(!p.hasItem(item)){
+            String item = it.next();
+            if(!p.hasItem(item, requiredItem.get(item))){
                 return false;
             }
         }
-        for(HouseObject obj: viableObjects){
-            Iterator<Item> it2 = requiredObjectInventory.keySet().iterator();
-            while(it.hasNext()){
-                Item objectItem = it2.next();
-                if(obj.hasItem(objectItem)) return false;
-            }
+        return true;
+    }
+
+    @Override
+    public String fulfilledNeed() {
+        return fulfilledNeed;
+    }
+
+    @Override
+    public boolean available(double time) {
+        int newEndTime = (endTime - startTime) % 24;
+        return (Time.getHours(time) % 24) > newEndTime;
+    }
+
+    @Override
+    public boolean itemsExist(SimulationMap map) {
+        
+        for(String item: requiredItem.keySet()){
+            if(!map.hasItem(item, requiredItem.get(item))) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Map<String, Integer> getRequiredItems() {
+        return requiredItem;
+    }
+
+    @Override
+    public double getDurationSeconds() {
+        return (double)(durationMinutes * 60);
+    }
+
+    @Override
+    public boolean personHasAllItems(Person person) {
+        for(String item: requiredItem.keySet()){
+            if(!person.hasItem(item, requiredItem.get(item))) return false;
         }
         return true;
     }

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import no.oddsor.simulator3.json.JSON;
 
 /**
  *
@@ -19,6 +22,7 @@ public class Simulator {
     int simsPerSec;
     public Time time;
     public double currentTime;
+    private TaskManager taskManager;
     
     /**
      *
@@ -32,7 +36,13 @@ public class Simulator {
         this.simsPerSec = simulationsPerSec;
         this.time = new Time(0);
         this.currentTime = 0;
-        this.tasks = TaskSingleton.getTaskList();
+        JSON j = null;
+        try {
+            j = new JSON("tasks.json");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        this.taskManager = new TaskManager(j);
     }
     
     /**
@@ -42,54 +52,33 @@ public class Simulator {
     public boolean simulationStep(){
         boolean movement = false;
         for(Person person: people){
-            Queue<Node> route = person.getRoute();
-            if(route != null){ //We're traveling!
+            if(person.getRoute() != null){ //We're traveling!
                 person.setLocation(map.moveActor(person, simsPerSec));
                 movement = true;
-            }else if(person.getTask() != null){ //TODO else if not doing target task, do task
-                person.getTask().progressTask(1.0/simsPerSec);
-                if(person.getTask().remainingDuration() <= 0.0) person.setTask(null);
+            }else if(person.getCurrentTask() != null){
+                person.progressTask(1.0/simsPerSec);
+                if(person.remainingDuration() <= 0.0) person.setCurrentTask(null);
+            }else if(person.getTargetItem() != null){
+                if(person.getFetchTime() > 0.0) continue;
+                Item fetchedItem = map.popItem(person.getTargetItem(), map.getClosestNode(person.currentLocation()));
+                if(fetchedItem != null){ person.addItem(fetchedItem);
+                    if(person.hasItem(fetchedItem.name, 
+                            person.getCurrentTask().getRequiredItems().get(fetchedItem.name))){
+                        person.setTargetItem(null);
+                        for(String itemName: person.getCurrentTask().getRequiredItems().keySet()){
+                            if(!person.hasItem(itemName, person.getCurrentTask().getRequiredItems().get(itemName))){
+                                person.setTargetItem(itemName);
+                            }
+                        }
+                    }
+                }
             }else{
-                person.setTask(taskmanager.findTask(person, map, time));
+                taskManager.findTask(person, map, currentTime);
             }
             person.passTime(1.0/simsPerSec);
         }
         currentTime += (1.0/simsPerSec);
         return movement;
-    }
-    
-    private Task getNextTask(Person p){
-        List<Need> needs = p.getNeeds();
-        Task task = null;
-        ArrayList<Task> goalTasks = getGoalTasks(filterAvailableTasks(tasks));
-        for(Need need: needs){
-            if(need.getValue() > 60) continue;
-            for(Task fTask: goalTasks){
-                if(fTask.fulfilledNeed != null && fTask.fulfilledNeed.equals(need.name()) 
-                        && fTask.completable(p, map.objects)){
-                    task = fTask;
-                }
-            }
-        }
-        return task;
-    }
-    
-    private ArrayList<Task> filterAvailableTasks(ArrayList<Task> allTasks){
-        ArrayList<Task> filteredTasks = new ArrayList<>();
-        
-        for(Task task: allTasks){
-            if(task.taskAvailable(time.getDay(currentTime), time.getHours(currentTime))) filteredTasks.add(task);
-        }
-        return filteredTasks;
-    }
-    
-    private ArrayList<Task> getGoalTasks(ArrayList<Task> allTasks){
-        ArrayList<Task> goalTasks = new ArrayList<>();
-        for(Task task: allTasks){
-            if(task.fulfilledNeed == null) continue;
-            goalTasks.add(task);
-        }
-        return goalTasks;
     }
     
     public Collection<Person> getPeople(){
