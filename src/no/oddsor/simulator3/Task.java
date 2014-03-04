@@ -4,9 +4,11 @@ package no.oddsor.simulator3;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -26,10 +28,10 @@ public class Task implements ITask{
     String taskName;
     int durationMinutes;
     double remainingSeconds;
-    List<HouseObject> performedAt;
+    String performedAt;
     String type;
 
-    public Task(String taskName, String type, int durationMinutes, List<HouseObject> performedAt) {
+    public Task(String taskName, String type, int durationMinutes, String performedAt) {
         this.taskName = taskName;
         this.type = type;
         this.durationMinutes = durationMinutes;
@@ -44,7 +46,7 @@ public class Task implements ITask{
     }
     
     public Task(String taskName, String type, int durationSeconds,
-            int startTime, int endTime, List<HouseObject> performedAt) {
+            int startTime, int endTime, String performedAt) {
         this(taskName, type, durationSeconds, performedAt);
         this.startTime = startTime;
         this.endTime = endTime;
@@ -66,9 +68,8 @@ public class Task implements ITask{
     public Collection<HouseObject> getViableAppliances(Collection<HouseObject> allObjects){
         Collection<HouseObject> viableObjects = new ArrayList<>();
         if(performedAt != null){
-            for (HouseObject appliance : performedAt) {
                 for (HouseObject obj : allObjects) {
-                    if (appliance.type.equals(obj.type)) {
+                    if (performedAt.equals(obj.type)) {
                         Iterator<String> it = requiredItem.keySet().iterator();
                         boolean fulfilled = true;
                         while(it.hasNext()){
@@ -77,7 +78,6 @@ public class Task implements ITask{
                         if(fulfilled) viableObjects.add(obj);
                     }
                 }
-            }
         }else System.out.println("Task " + taskName + " cannot be performed anywhere?");
         return viableObjects;
     }
@@ -113,10 +113,10 @@ public class Task implements ITask{
     }
 
     @Override
-    public boolean itemsExist(SimulationMap map) {
+    public boolean itemsExist(Person p, SimulationMap map) {
         
         for(String item: requiredItem.keySet()){
-            if(!map.hasItem(item, requiredItem.get(item))) return false;
+            if(!map.hasItem(item, requiredItem.get(item)) && !p.hasItem(item, requiredItem.get(item))) return false;
         }
         return true;
     }
@@ -138,4 +138,59 @@ public class Task implements ITask{
         }
         return true;
     }
+
+    @Override
+    public Set<String> getCreatedItems() {
+        Set<String> str = new HashSet<>();
+        for(String item: resultingItem.keySet()){
+            str.add(item);
+        }
+        return str;
+    }
+
+    @Override
+    public Set<String> getRequiredItemsSet() {
+        return requiredItem.keySet();
+    }
+
+    @Override
+    public List<String> getUsedAppliances() {
+        List<String> appliances = new ArrayList<>();
+        
+        appliances.add(performedAt);
+        
+        return appliances;
+    }
+
+    @Override
+    public void completeTask(Person p, SimulationMap map) {
+        if(fulfilledNeed != null){
+             List<Need> needs = p.getNeeds();
+             for(Need need: needs){
+                 if(need.name().equals(fulfilledNeed)) need.increaseValue(fulfilledAmount);
+             }
+        }
+        if(!resultingItem.isEmpty()){
+            for(String item: resultingItem.keySet()){
+                for(int i = 0; i < resultingItem.get(item); i++){
+                    map.addItem(new Item(item, map.getClosestNode(p.currentLocation())));
+                    map.items.size();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void consumeItem(Person p) {
+        for(String item: requiredItem.keySet()){
+            p.removeItem(item, requiredItem.get(item));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return taskName; //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }

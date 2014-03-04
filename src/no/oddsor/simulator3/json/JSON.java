@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import no.oddsor.simulator3.ITask;
+import no.oddsor.simulator3.Need;
 import no.oddsor.simulator3.Person;
 import no.oddsor.simulator3.Task;
 import org.json.simple.*;
@@ -44,11 +46,11 @@ public class JSON {
                         (String) nextTask.get("Type"), 
                         Integer.parseInt(nextTask.get("Duration").toString()),
                         Integer.parseInt(timespan.get(0).toString()), 
-                        Integer.parseInt(timespan.get(1).toString()), null));
+                        Integer.parseInt(timespan.get(1).toString()), (String) nextTask.get("Appliance")));
             }else{
                 tasks.add(newTask = new Task((String) nextTask.get("Name"), 
                         (String) nextTask.get("Type"), 
-                        Integer.parseInt(nextTask.get("Duration").toString()), null));
+                        Integer.parseInt(nextTask.get("Duration").toString()), (String) nextTask.get("Appliance")));
             }
             if(nextTask.containsKey("IncreasesNeed")){
                 JSONArray need = (JSONArray) nextTask.get("IncreasesNeed");
@@ -94,13 +96,31 @@ public class JSON {
         return appliances;
     }
     
+    public List<Need> getNeeds(){
+        List<Need> needs = new ArrayList<>();
+        JSONArray taskList = (JSONArray) object.get("Tasks");
+        Set<String> needNames = new HashSet<>();
+        Iterator tasks = taskList.iterator();
+        while(tasks.hasNext()){
+            JSONObject task = (JSONObject) tasks.next();
+            if(task.containsKey("IncreasesNeed")){
+                JSONArray arr = (JSONArray) task.get("IncreasesNeed");
+                needNames.add((String) arr.get(0));
+            }
+        }
+        for(String name: needNames){
+            needs.add(new Need(name, 1.0));
+        }
+        return needs;
+    }
+    
     public Collection<Person> getPeople(){
         JSONArray peopleMap = (JSONArray) object.get("People");
         Collection<Person> people = new ArrayList<>();
         for(int i = 0; i < peopleMap.size(); i++){
             JSONObject personObject = (JSONObject) peopleMap.get(i);
             Person p = new Person((String) personObject.get("Name"), 
-                    (String) personObject.get("Image"), null);
+                    (String) personObject.get("Image"), null, getNeeds());
             people.add(p);
         }
         return people;

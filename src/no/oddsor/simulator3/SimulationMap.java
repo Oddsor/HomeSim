@@ -5,6 +5,8 @@ import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 /**
  * An implementation of a map. Players move on an screencap of an apartment's
@@ -20,7 +22,7 @@ public class SimulationMap {
     public final String mapName;
     public final int startNodeId;
     
-    private final ArrayList<Node> nodes;
+    private ArrayList<Node> nodes;
     private final Collection<Person> people;
     public ArrayList<HouseObject> objects;
     public Collection<Item> items;
@@ -31,7 +33,8 @@ public class SimulationMap {
         this.people = people;
         this.walkingSpeedPerSec = walkingDistancePerSec;
         this.startNodeId = startId;
-        this.nodes = Node.getNodes(db);
+        if(db != null) this.nodes = Node.getNodes(db);
+        else nodes = new ArrayList<>();
         objects = new ArrayList<>();
         for(Node node: nodes){
             if(!node.types.isEmpty()){
@@ -77,6 +80,7 @@ public class SimulationMap {
     }
     
     public void addItem(Item item){
+        System.out.println("Added " + item.name + " to map");
         this.items.add(item);
     }
     
@@ -96,5 +100,49 @@ public class SimulationMap {
             if(item.name.equals(requestedItem)) count++;
         }
         return count >= amount;
+    }
+    
+    public Collection<Node> getLocationsOfItem(String itemName){
+        Collection<Node> itemNodes = new ArrayList<>();
+        for(Item item: items){
+            if(item.name.equals(itemName)){
+                itemNodes.add(item.location);
+            }
+        }
+        return itemNodes;
+    }
+    
+    public Collection<Node> getLocationAppliances(List<String> appliance){
+        Collection<Node> locations = new ArrayList<>();
+        for(HouseObject app: objects){
+            for(String appType: appliance){
+                if(app.type.equals(appType)) locations.add(app.location);
+            }
+            
+        }
+        return locations;
+    }
+    
+    public Collection<HouseObject> getAppliances(){
+        return objects;
+    }
+    
+    public Node getRandomNode(){
+        List<Node> nodePool = new ArrayList<>(nodes);
+        for(HouseObject app: objects){
+            nodePool.remove(app.location);
+        }
+        Random rand = new Random();
+        return nodePool.get(rand.nextInt(nodePool.size()));
+    }
+    
+    public static void main(String[] args){
+        SimulationMap map = new  SimulationMap("", 5, 1, null, null);
+        map.addItem(new Item("Wares", null));
+        Task t = new Task("ye", "s", 1, null);
+        t.addRequiredItem("Wares", 1);
+        System.out.println(t.itemsExist(new Person("s", "oddsurcut.png", null, null), map));
+        System.out.println(map.hasItem("Wares", 1));
+        System.out.println(map.hasItem("Wares", 2));
     }
 }

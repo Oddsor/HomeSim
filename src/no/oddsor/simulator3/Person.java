@@ -20,8 +20,6 @@ public class Person{
     private Deque<Node> route;
     private final List<Need> needs;
     private ITask currentTask;
-    private HouseObject usingObject;
-    private double taskCount;
     public final String name;
     private double fetchTime;
     private double remainingTaskDuration;
@@ -32,12 +30,17 @@ public class Person{
     public Image avatarImg;
     private ITask goalTask;
     
-    public Person(String name, String avatarImage, Point currentLocation){
+    public Person(String name, String avatarImage, Point currentLocation, List<Need> needs){
         this.name = name;
         this.currentLocation = currentLocation;
         this.avatarImg = new ImageIcon(getClass().getResource(avatarImage)).getImage();
-        needs = new ArrayList<>();
+        if(needs != null) this.needs = new ArrayList<>(needs);
+        else this.needs = null;
         inventory = new HashMap<>();
+    }
+    
+    public void addNeed(Need need){
+        needs.add(need);
     }
     
     Point currentLocation() {
@@ -56,7 +59,7 @@ public class Person{
         return false;
     }
 
-    Queue<Node> getRoute() {
+    Deque<Node> getRoute() {
         if(route == null || route.isEmpty()) return null;
         return route;
     }
@@ -74,8 +77,9 @@ public class Person{
     }
     
     public void setCurrentTask(ITask task){
+        System.out.println("Task set");
         this.currentTask = task;
-        this.remainingTaskDuration = task.getDurationSeconds();
+        if(task != null) this.remainingTaskDuration = task.getDurationSeconds();
     }
     
     public double remainingDuration(){
@@ -90,6 +94,7 @@ public class Person{
         return goalTask;
     }
     public void setGoalTask(ITask task){
+        System.out.println("Goal set");
         this.goalTask = task;
     }
     
@@ -97,38 +102,12 @@ public class Person{
         this.route = route;
     }
 
-/*    void setTask(Task nextTask, SimulationMap map) {
-        if(nextTask != null){
-            currentTask = nextTask;
-            taskCount = currentTask.durationSeconds;
-            System.out.println(name + " decided to do " + currentTask.taskName);
-            Collection<Node> nodes = new ArrayList<>();
-            Collection<Person> people = map.getPeople();
-            for(HouseObject object: currentTask.getViableObjects(map.objects)){
-                boolean inUse = false;
-                for(Person p: people){
-                    if(p.usingObject != null && p.usingObject.equals(object)) inUse = true;
-                }
-                if(!inUse)nodes.add(object.getLocation());
-            }
-            try {
-                route = AStarMulti.getRoute(nodes, map.getClosestNode(currentLocation));
-                if(!route.isEmpty()){
-                    for(HouseObject object: currentTask.getViableObjects(map.objects)){
-                        if(object.getLocation().equals(route.getLast())) usingObject = object;
-                    }
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }*/
-    
     public ITask getCurrentTask(){
         return currentTask;
     }
     
     public void setTargetItem(String itemName){
+        System.out.println("Item set");
         this.targetItem = itemName;
         fetchTime = 2.0;
     }
@@ -137,14 +116,22 @@ public class Person{
         return targetItem;
     }
 
+    public void progressFetch(double seconds){
+        this.fetchTime -= seconds;
+    }
+    
     void passTime(double seconds) {
         for(Need need: needs){
             need.deteriorate(seconds);
         }
-        fetchTime -= seconds;
     }
     
     public double getFetchTime(){
         return fetchTime;
+    }
+    
+    public void removeItem(String itemName, int amount){
+        inventory.put(itemName, inventory.get(itemName) - amount);
+        if(inventory.get(itemName) <= 0) inventory.remove(itemName);
     }
 }

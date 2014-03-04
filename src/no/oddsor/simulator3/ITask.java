@@ -9,6 +9,7 @@ package no.oddsor.simulator3;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -19,7 +20,7 @@ public interface ITask {
     
     public boolean available(double time);
     
-    public boolean itemsExist(SimulationMap map);
+    public boolean itemsExist(Person p, SimulationMap map);
     
     public boolean personHasAllItems(Person person);
     
@@ -28,4 +29,14 @@ public interface ITask {
     public Map<String, Integer> getRequiredItems();
     
     public double getDurationSeconds();
+    
+    public Set<String> getCreatedItems();
+    
+    public Set<String> getRequiredItemsSet();
+    
+    public List<String> getUsedAppliances();
+    
+    public void completeTask(Person p, SimulationMap map);
+    
+    public void consumeItem(Person p);
 }

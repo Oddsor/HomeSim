@@ -8,14 +8,14 @@ package no.oddsor.simulator3;
 public class Need implements Comparable<Need>{
     
     private String type;
-    private int deteriorationRate;
+    private double deteriorationRate;
     private double value;
     
-    public Need(String type, double value){
+    public Need(String type, double deteriorationRate){
         this.type = type;
         //TODO add deteriorationrate
-        this.deteriorationRate = 1;
-        this.value = value;
+        this.deteriorationRate = deteriorationRate;
+        this.value = 100;
     }
     
     public void deteriorate(double seconds){

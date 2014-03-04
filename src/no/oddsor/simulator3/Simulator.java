@@ -3,10 +3,6 @@ package no.oddsor.simulator3;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import no.oddsor.simulator3.json.JSON;
 
 /**
@@ -22,7 +18,7 @@ public class Simulator {
     int simsPerSec;
     public Time time;
     public double currentTime;
-    private TaskManager taskManager;
+    private final TaskManager taskManager;
     
     /**
      *
@@ -57,19 +53,21 @@ public class Simulator {
                 movement = true;
             }else if(person.getCurrentTask() != null){
                 person.progressTask(1.0/simsPerSec);
-                if(person.remainingDuration() <= 0.0) person.setCurrentTask(null);
+                if(person.remainingDuration() <= 0.0){
+                    person.getCurrentTask().completeTask(person, map);
+                    person.setCurrentTask(null);
+                }
             }else if(person.getTargetItem() != null){
-                if(person.getFetchTime() > 0.0) continue;
-                Item fetchedItem = map.popItem(person.getTargetItem(), map.getClosestNode(person.currentLocation()));
-                if(fetchedItem != null){ person.addItem(fetchedItem);
-                    if(person.hasItem(fetchedItem.name, 
-                            person.getCurrentTask().getRequiredItems().get(fetchedItem.name))){
+                person.progressFetch(1.0/simsPerSec);
+                System.out.println("Fetching..");
+                if(person.getFetchTime() <= 0.0){
+                    Item fetchedItem = map.popItem(person.getTargetItem(), map.getClosestNode(person.currentLocation()));
+                    System.out.println(fetchedItem.name);
+                    if(fetchedItem != null){ 
+                        person.addItem(fetchedItem);
                         person.setTargetItem(null);
-                        for(String itemName: person.getCurrentTask().getRequiredItems().keySet()){
-                            if(!person.hasItem(itemName, person.getCurrentTask().getRequiredItems().get(itemName))){
-                                person.setTargetItem(itemName);
-                            }
-                        }
+                    }else{
+                        System.out.println("Trouble fetching item??");
                     }
                 }
             }else{

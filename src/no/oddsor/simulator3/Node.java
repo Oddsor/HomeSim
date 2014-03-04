@@ -51,7 +51,7 @@ public class Node extends AbstractTable implements AStarNode{
     public void update(){
         try {
             if(id == -1){
-                db.exec("INSERT INTO node VALUES(null, " + location.x + ", " + location.y + ");");
+                db.exec("INSERT INTO node VALUES(1, null, " + location.x + ", " + location.y + ");");
                 id = (int)db.getLastInsertId();
                 System.out.println("Added new node");
             }

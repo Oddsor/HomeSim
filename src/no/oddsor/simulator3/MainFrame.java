@@ -22,6 +22,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
+import no.oddsor.simulator3.json.JSON;
 import sun.awt.VerticalBagLayout;
 
 /**
@@ -63,10 +64,11 @@ public class MainFrame extends JFrame{
             db = dbHandler.getDb();
             db.open();
             ArrayList<Person> people = new ArrayList<>();
-            people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0)));
-            people.add(new Person("Obama", "obama-head.png", new Point(0, 0)));
+            JSON j = new JSON("Tasks.json");
+            people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0), j.getNeeds()));
+            //people.add(new Person("Obama", "obama-head.png", new Point(0, 0), j.getNeeds()));
             SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, people, db);
-            sim = new Simulator(map, 10);
+            sim = new Simulator(map, 3);
             painter = new SimulationDisplay("appsketch.jpg", new Point(), db);
             designer = new DesignFrame(this, db);
         }catch(Exception e){
@@ -120,10 +122,13 @@ public class MainFrame extends JFrame{
         box.add(menubox);
         add(box);
         ActionListener timeListen = new ActionListener() {
+            int slowSpeed = 10;
+            int fastSpeed = 1;
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                sim.simulationStep();
+                if(!sim.simulationStep()) tim.setDelay(fastSpeed);
+                else tim.setDelay(slowSpeed);
                 painter.update(sim.getPeople());
                 updateMenu();
             }
