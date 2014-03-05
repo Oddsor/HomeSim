@@ -3,6 +3,8 @@ package no.oddsor.simulator3;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.oddsor.AStarMulti.AStarMulti;
 import no.oddsor.simulator3.json.JSON;
 
@@ -72,7 +74,11 @@ public class Simulator {
                     }
                 }
             }else{
-                if(Math.random() < 0.25) person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
+                if(Math.random() < 0.25) try {
+                    person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 taskManager.findTask(person, map, currentTime);
             }
             person.passTime(1.0/simsPerSec);
