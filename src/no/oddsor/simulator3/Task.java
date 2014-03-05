@@ -108,8 +108,9 @@ public class Task implements ITask{
 
     @Override
     public boolean available(double time) {
-        int newEndTime = (endTime - startTime) % 24;
-        return (Time.getHours(time) % 24) - startTime > newEndTime;
+        int newEndTime = (endTime + (24 - startTime)) % 24;
+        int offset = (Time.getHours(time) + (24 - startTime)) % 24;
+        return offset < newEndTime;
     }
 
     @Override
@@ -192,5 +193,13 @@ public class Task implements ITask{
         return taskName; //To change body of generated methods, choose Tools | Templates.
     }
     
-    
+    public static void main(String[] args){
+        Task t2 = new Task("Hei", "jepp", 22, 1, 4, null);
+        System.out.println(t2.available(100));
+        Task t = new Task("Hei", "jepp", 22, 22, 6, null);
+        System.out.println(t.available(100));
+        double tim = 80000;
+        System.out.println(Time.getHours(tim));
+        System.out.println(t.available(tim));
+    }
 }

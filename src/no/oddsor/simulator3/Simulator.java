@@ -3,6 +3,7 @@ package no.oddsor.simulator3;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import net.oddsor.AStarMulti.AStarMulti;
 import no.oddsor.simulator3.json.JSON;
 
 /**
@@ -71,6 +72,7 @@ public class Simulator {
                     }
                 }
             }else{
+                if(Math.random() < 0.25) person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
                 taskManager.findTask(person, map, currentTime);
             }
             person.passTime(1.0/simsPerSec);
