@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.tables.Node;
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class SimulationMap {
     
     private ArrayList<Node> nodes;
     private final Collection<Person> people;
-    public ArrayList<HouseObject> objects;
+    public ArrayList<Appliance> objects;
     public Collection<Item> items;
     
     public SimulationMap(String mapName, int walkingDistancePerSec, int startId, 
@@ -38,7 +39,7 @@ public class SimulationMap {
         objects = new ArrayList<>();
         for(Node node: nodes){
             if(!node.types.isEmpty()){
-                for(HouseObject obj: node.types){
+                for(Appliance obj: node.types){
                     objects.add(obj);
                 }
             }
@@ -114,7 +115,7 @@ public class SimulationMap {
     
     public Collection<Node> getLocationAppliances(List<String> appliance){
         Collection<Node> locations = new ArrayList<>();
-        for(HouseObject app: objects){
+        for(Appliance app: objects){
             for(String appType: appliance){
                 if(app.type.equals(appType)) locations.add(app.location);
             }
@@ -123,13 +124,13 @@ public class SimulationMap {
         return locations;
     }
     
-    public Collection<HouseObject> getAppliances(){
+    public Collection<Appliance> getAppliances(){
         return objects;
     }
     
     public Node getRandomNode(){
         List<Node> nodePool = new ArrayList<>(nodes);
-        for(HouseObject app: objects){
+        for(Appliance app: objects){
             nodePool.remove(app.location);
         }
         Random rand = new Random();

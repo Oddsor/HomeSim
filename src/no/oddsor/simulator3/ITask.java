@@ -24,7 +24,7 @@ public interface ITask {
     
     public boolean personHasAllItems(Person person);
     
-    public Collection<HouseObject> getViableAppliances(Collection<HouseObject> allAppliances);
+    public Collection<Appliance> getViableAppliances(Collection<Appliance> allAppliances);
     
     public Map<String, Integer> getRequiredItems();
     

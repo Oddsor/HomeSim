@@ -1,5 +1,5 @@
 
-package no.oddsor.simulator3;
+package no.oddsor.simulator3.tables;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
@@ -17,7 +17,7 @@ abstract class AbstractTable{
     private static final String STRING = "STRING";
     
     SQLiteConnection db;
-    int id;
+    public int id;
     
     private String tableName;
     private Map<String, String> columns;

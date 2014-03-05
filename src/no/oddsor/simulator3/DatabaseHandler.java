@@ -1,6 +1,8 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.tables.Node;
+import no.oddsor.simulator3.tables.Edge;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import java.io.File;

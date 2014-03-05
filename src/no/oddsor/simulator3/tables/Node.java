@@ -1,5 +1,5 @@
 
-package no.oddsor.simulator3;
+package no.oddsor.simulator3.tables;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
@@ -8,6 +8,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import net.oddsor.AStarMulti.AStarNode;
+import no.oddsor.simulator3.Appliance;
+import no.oddsor.simulator3.Room;
 
 /**
  *
@@ -19,7 +21,7 @@ public class Node extends AbstractTable implements AStarNode{
     
     private Point location;
     private final Collection<Node> neighbours;
-    public ArrayList<HouseObject> types;
+    public ArrayList<Appliance> types;
     private Room room;
 
     public Node(SQLiteConnection db, int id, Point location, Room room) throws SQLiteException {
@@ -60,7 +62,7 @@ public class Node extends AbstractTable implements AStarNode{
                 System.out.println("Updated node's location");
             }
             db.exec("DELETE FROM node_objects WHERE nodeid = " + id);
-            for(HouseObject type: types){
+            for(Appliance type: types){
                 db.exec("INSERT INTO node_objects VALUES(null, " + id + ", '" + type.type() + "');");
             }
         }catch(Exception e){
@@ -76,10 +78,10 @@ public class Node extends AbstractTable implements AStarNode{
                 Node nod = new Node(db, st.columnInt(1), 
                         new Point(st.columnInt(2), st.columnInt(3)), 
                         Room.getRoom(st.columnInt(0), db));
-                ArrayList<HouseObject> types = new ArrayList<>();
+                ArrayList<Appliance> types = new ArrayList<>();
                 SQLiteStatement st2 = db.prepare("SELECT * FROM node_objects WHERE nodeid = " + st.columnInt(1) + ";");
                 while(st2.step()){
-                    types.add(new HouseObject(st2.columnString(2), nod));
+                    types.add(new Appliance(st2.columnString(2), nod));
                 }
                 nod.types = types;
                 nodes.add(nod);
@@ -110,13 +112,13 @@ public class Node extends AbstractTable implements AStarNode{
     }
     
     public void addObject(String type){
-        if(types.add(new HouseObject(type, this))){
+        if(types.add(new Appliance(type, this))){
             update();
         }
     }
     
     public void removeObject(String type){
-        for(HouseObject obj: types){
+        for(Appliance obj: types){
             if(obj.type.equals(type)){
                 types.remove(obj);
                 update();

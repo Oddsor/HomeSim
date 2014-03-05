@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.tables.Node;
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -9,8 +10,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -118,7 +117,7 @@ public class DesignFrame extends JFrame implements ActionListener{
         Iterator it = selectedPoint.types.iterator();
         ArrayList<String> list = new ArrayList<>();
         while(it.hasNext()){
-            HouseObject obj = (HouseObject) it.next();
+            Appliance obj = (Appliance) it.next();
             list.add(obj.type);
         }
         Object[] nodeObjects = new Object[list.size()];

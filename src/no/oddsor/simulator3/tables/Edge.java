@@ -1,5 +1,5 @@
 
-package no.oddsor.simulator3;
+package no.oddsor.simulator3.tables;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteStatement;

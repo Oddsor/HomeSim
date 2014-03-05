@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.tables.Node;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;

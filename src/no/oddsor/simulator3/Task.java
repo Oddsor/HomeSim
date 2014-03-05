@@ -65,10 +65,10 @@ public class Task implements ITask{
     }
     
     @Override
-    public Collection<HouseObject> getViableAppliances(Collection<HouseObject> allObjects){
-        Collection<HouseObject> viableObjects = new ArrayList<>();
+    public Collection<Appliance> getViableAppliances(Collection<Appliance> allObjects){
+        Collection<Appliance> viableObjects = new ArrayList<>();
         if(performedAt != null){
-                for (HouseObject obj : allObjects) {
+                for (Appliance obj : allObjects) {
                     if (performedAt.equals(obj.type)) {
                         Iterator<String> it = requiredItem.keySet().iterator();
                         boolean fulfilled = true;
@@ -108,6 +108,7 @@ public class Task implements ITask{
 
     @Override
     public boolean available(double time) {
+        if(startTime < 0 || endTime < 0) return true;
         int newEndTime = (endTime + (24 - startTime)) % 24;
         int offset = (Time.getHours(time) + (24 - startTime)) % 24;
         return offset < newEndTime;
@@ -194,9 +195,9 @@ public class Task implements ITask{
     }
     
     public static void main(String[] args){
-        Task t2 = new Task("Hei", "jepp", 22, 1, 4, null);
+        Task t2 = new Task("Hei", "jepp", 22, null);
         System.out.println(t2.available(100));
-        Task t = new Task("Hei", "jepp", 22, 22, 6, null);
+        Task t = new Task("Hei", "jepp", 22, 9, 23, null);
         System.out.println(t.available(100));
         double tim = 80000;
         System.out.println(Time.getHours(tim));

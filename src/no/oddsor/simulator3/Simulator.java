@@ -74,12 +74,15 @@ public class Simulator {
                     }
                 }
             }else{
-                if(Math.random() < 0.25) try {
-                    person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                if(Math.random() < 0.25){
+                    try {
+                        person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }else{
+                    taskManager.findTask(person, map, currentTime);
                 }
-                taskManager.findTask(person, map, currentTime);
             }
             person.passTime(1.0/simsPerSec);
         }

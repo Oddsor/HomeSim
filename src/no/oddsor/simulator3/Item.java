@@ -2,6 +2,8 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.tables.Node;
+
 /**
  *
  * @author Odd

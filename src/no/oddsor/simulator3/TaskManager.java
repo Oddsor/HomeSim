@@ -1,8 +1,10 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.tables.Node;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import net.oddsor.AStarMulti.AStarMulti;
@@ -42,7 +44,8 @@ public class TaskManager {
             List<Need> needs = new ArrayList<>(person.getNeeds());
             while(!needs.isEmpty()){
                 Need lowest = getLowestNeed(needs);
-                ITask taskForNeed = taskForNeed(lowest, availableTasks);
+                System.out.println(lowest.name() +  " is lowest need");
+                ITask taskForNeed = taskForNeed(lowest, availableTasks, time, person, map);
                 if(taskForNeed != null){
                     person.setGoalTask(taskForNeed);
                     break;
@@ -62,6 +65,7 @@ public class TaskManager {
         else{
             System.out.println(currentTask.getRequiredItemsSet().toString());
             Collection<ITask> prereqTasks = tasksForGoal(currentTask, person, map);
+            System.out.println(prereqTasks.toString());
             for(ITask task: prereqTasks){
                 findTaskLoop(task, person, map);
                 if(person.targetItem != null || person.getCurrentTask() != null) break;
@@ -71,13 +75,14 @@ public class TaskManager {
     
     public Collection<ITask> tasksForGoal(ITask goal, Person p, SimulationMap map){
         System.out.println("Finding tasks for " + goal.toString());
-        Collection<ITask> preTasks = new ArrayList<>();
+        Collection<ITask> preTasks = new HashSet<>();
         for(ITask task: tasks){
             for(String str: task.getCreatedItems()){
                 if(goal.getRequiredItemsSet().contains(str)){
                     System.out.println("Adding " + task.toString());
                     System.out.println(task.itemsExist(p, map));
-                    preTasks.add(task);
+                    if(!task.itemsExist(p, map)) preTasks.addAll(tasksForGoal(task, p, map));
+                    else preTasks.add(task);
                 }
             }
         }
@@ -116,12 +121,23 @@ public class TaskManager {
         }
     }
     
-    public ITask taskForNeed(Need need, Collection<ITask> tasks){
+    public ITask taskForNeed(Need need, Collection<ITask> tasks, double time, Person person, SimulationMap map){
         List<ITask> tasksForNeed = new ArrayList<>();
         for(ITask task: tasks){
-            if(task.fulfilledNeed() != null && task.fulfilledNeed().equals(need.name())) tasksForNeed.add(task);
+            if(task.fulfilledNeed() != null && task.fulfilledNeed().equals(need.name())){
+                Collection<ITask> preTasks = tasksForGoal(task, person, map);
+                if(allAvailable(preTasks, time)) tasksForNeed.add(task);
+            }
         }
+        tasksForNeed = new ArrayList<>(filterAvailable(tasksForNeed, time));
         return (tasksForNeed.isEmpty()? null: tasksForNeed.get(new Random().nextInt(tasksForNeed.size())));
+    }
+    
+    public boolean allAvailable(Collection<ITask> tasks, double time){
+        for(ITask task: tasks){
+            if(!task.available(time)) return false;
+        }
+        return true;
     }
     
     public List<Need> getDesperateNeeds(List<Need> needs){

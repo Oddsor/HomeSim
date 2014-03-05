@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import no.oddsor.simulator3.tables.Node;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,13 +9,13 @@ import java.util.Map;
  *
  * @author Odd
  */
-public class HouseObject{
+public class Appliance{
     
     Map<String, Integer> inventory;
-    String type;
+    public String type;
     Node location;
     
-    public HouseObject(String itemType, Node location){
+    public Appliance(String itemType, Node location){
         this.type = itemType;
         this.location = location;
         inventory = new HashMap<>();
