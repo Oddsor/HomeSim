@@ -14,8 +14,8 @@ import no.oddsor.simulator3.json.JSON;
  */
 public class TaskManager {
     
-    private JSON json;
-    private Collection<ITask> tasks;
+    private final JSON json;
+    private final Collection<ITask> tasks;
     
     public TaskManager(JSON j){
         this.json = j;
@@ -38,6 +38,7 @@ public class TaskManager {
             }
         }else{
             //IF NO GOALTASK, WHAT THEN? CREATE A GOAL
+            System.out.println("Finding a new goal task");
             List<Need> needs = new ArrayList<>(person.getNeeds());
             while(!needs.isEmpty()){
                 Need lowest = getLowestNeed(needs);
@@ -60,7 +61,7 @@ public class TaskManager {
         }
         else{
             System.out.println(currentTask.getRequiredItemsSet().toString());
-            Collection<ITask> prereqTasks = tasksForGoal(currentTask);
+            Collection<ITask> prereqTasks = tasksForGoal(currentTask, person, map);
             for(ITask task: prereqTasks){
                 findTaskLoop(task, person, map);
                 if(person.targetItem != null || person.getCurrentTask() != null) break;
@@ -68,11 +69,16 @@ public class TaskManager {
         }
     }
     
-    public Collection<ITask> tasksForGoal(ITask goal){
+    public Collection<ITask> tasksForGoal(ITask goal, Person p, SimulationMap map){
+        System.out.println("Finding tasks for " + goal.toString());
         Collection<ITask> preTasks = new ArrayList<>();
         for(ITask task: tasks){
             for(String str: task.getCreatedItems()){
-                if(goal.getRequiredItemsSet().contains(str)) preTasks.add(task);
+                if(goal.getRequiredItemsSet().contains(str)){
+                    System.out.println("Adding " + task.toString());
+                    System.out.println(task.itemsExist(p, map));
+                    preTasks.add(task);
+                }
             }
         }
         return preTasks;

@@ -109,7 +109,7 @@ public class Task implements ITask{
     @Override
     public boolean available(double time) {
         int newEndTime = (endTime - startTime) % 24;
-        return (Time.getHours(time) % 24) > newEndTime;
+        return (Time.getHours(time) % 24) - startTime > newEndTime;
     }
 
     @Override

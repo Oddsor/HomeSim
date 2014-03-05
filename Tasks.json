@@ -121,7 +121,7 @@
 		{
 			"Name": "Sleep",
 			"Type": "Infinite",
-			"Duration": -1,
+			"Duration": 30,
 			"Appliance": "Bed",
 			"Timespan": [23,7],
 			"IncreasesNeed": ["Energy", 5]
