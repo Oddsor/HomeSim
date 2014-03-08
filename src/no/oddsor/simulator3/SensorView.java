@@ -10,6 +10,9 @@
 
 package no.oddsor.simulator3;
 
+import java.awt.event.MouseEvent;
+import javax.swing.event.MouseInputListener;
+
 /**
  *
  * @author Odd
@@ -21,6 +24,44 @@ public class SensorView extends javax.swing.JFrame {
      */
     public SensorView() {
         initComponents();
+        sensorMap.addMouseListener(new MouseInputListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                SensorMap s = (SensorMap) sensorMap;
+                s.checkOverlap(me.getX(), me.getY());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+                
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+                
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+                
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent me) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent me) {
+                
+            }
+        });
     }
 
     /**
@@ -33,7 +74,7 @@ public class SensorView extends javax.swing.JFrame {
     private void initComponents() {
 
         jButton1 = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
+        sensorMap = new SensorMap();
         addButton = new javax.swing.JButton();
         sensorBox = new javax.swing.JComboBox();
         removeButton = new javax.swing.JButton();
@@ -43,14 +84,14 @@ public class SensorView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout sensorMapLayout = new javax.swing.GroupLayout(sensorMap);
+        sensorMap.setLayout(sensorMapLayout);
+        sensorMapLayout.setHorizontalGroup(
+            sensorMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 395, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        sensorMapLayout.setVerticalGroup(
+            sensorMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
@@ -76,7 +117,7 @@ public class SensorView extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(sensorMap, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -89,7 +130,7 @@ public class SensorView extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(sensorMap, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -143,9 +184,9 @@ public class SensorView extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton jButton1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton removeButton;
     private javax.swing.JComboBox sensorBox;
+    private javax.swing.JPanel sensorMap;
     // End of variables declaration//GEN-END:variables
 }

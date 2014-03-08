@@ -4,20 +4,24 @@
  */
 package no.oddsor.simulator3;
 
+import java.awt.Point;
+import java.awt.geom.Ellipse2D;
+
 /**
  *
  * @author Odd
  */
 class Circle {
-    public final int xPosition;
-    public final int yPosition;
-    public final int width;
-    public final int height;
     
-    public Circle(int xPosition, int yPosition, int width, int height){
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
-        this.width = width;
-        this.height = height;
+    private final Point origo;
+    private final double radian;
+    
+    public Circle(Point origo, double radian){
+        this.origo = origo;
+        this.radian = radian;
+    }
+    
+    public Ellipse2D.Double getEllipse(){
+        return new Ellipse2D.Double(origo.x - radian, origo.y - radian, radian * 2, radian * 2);
     }
 }
