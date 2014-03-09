@@ -7,12 +7,19 @@
 package no.oddsor.simulator3;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
+import no.oddsor.simulator3.json.SensorReader;
+import no.oddsor.simulator3.sensor.Sensor;
+import no.oddsor.simulator3.sensor.SensorArea;
 
 /**
  *
@@ -20,33 +27,37 @@ import javax.swing.JPanel;
  */
 public class SensorMap extends JPanel{
 
-    private Cone c;
-    private Cone c2;
-    private Cone c3;
+    Collection<Sensor> sensors;
     
     public SensorMap() {
-        c = new Cone(new Point(200, 200), 90, new int[]{50, 100}, 20);
-        c2 = new Cone(new Point(200, 200), 0, new int[]{100, 150}, 60);
-        c3 = new Cone(new Point(200, 200), 270, new int[]{50, 100}, 20);
+        try {
+            SensorReader reader = new SensorReader("sensors.json");
+            sensors = reader.getSensors();
+        } catch (Exception ex) {
+            Logger.getLogger(SensorMap.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+        }
+        
     }
 
     @Override
     protected void paintComponent(Graphics grphcs) {
         super.paintComponent(grphcs); //To change body of generated methods, choose Tools | Templates.
         Graphics2D g = (Graphics2D) grphcs;
-        g.setColor(Color.BLACK);
-        g.fill(c.getShape());
-        g.setColor(Color.BLUE);
-        g.fill(c2.getShape());
-        g.setColor(Color.ORANGE);
-        g.fill(c3.getShape());
-        g.fill(new Rectangle2D.Double(100, 100, 20, 20));
+        for(Sensor sensor: sensors){
+            for(SensorArea area: sensor.getSensorAreas()){
+                System.out.println("Printing area: " + area.getName());
+                g.setColor(Color.BLACK);
+                g.draw(area.getArea());
+                Color transparentYellow = new Color(255,255,0,50);
+                g.setColor(transparentYellow);
+                g.fill(area.getArea());
+            }
+            g.draw(new Rectangle(new Point(322,303 - 1000), new Dimension(1000, 1000)));
+        }
     }
     
     public void checkOverlap(int x, int y){
         Point2D p = new Point(x, y);
-        System.out.println(c.getShape().contains(p));
-        System.out.println(c2.getShape().contains(p));
-        System.out.println(c3.getShape().contains(p));
     }
 }

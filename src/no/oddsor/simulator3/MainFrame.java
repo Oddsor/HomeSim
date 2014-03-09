@@ -23,6 +23,8 @@ import javax.swing.JSeparator;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import no.oddsor.simulator3.json.JSON;
+import no.oddsor.simulator3.json.SensorReader;
+import no.oddsor.simulator3.sensor.Sensor;
 import sun.awt.VerticalBagLayout;
 
 /**
@@ -69,7 +71,8 @@ public class MainFrame extends JFrame{
             //people.add(new Person("Obama", "obama-head.png", new Point(0, 0), j.getNeeds()));
             SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, people, db);
             sim = new Simulator(map, 3);
-            painter = new SimulationDisplay("appsketch.jpg", new Point(), db);
+            Collection<Sensor> sensors = new SensorReader("sensors.json").getSensors();
+            painter = new SimulationDisplay("appsketch.jpg", db);
             designer = new DesignFrame(this, db);
         }catch(Exception e){
             e.printStackTrace();
@@ -118,7 +121,7 @@ public class MainFrame extends JFrame{
         bottomButtonBox.add(new JButton("Start sim"));
         bottomButtonBox.add(editButton);
         box.add(painter);
-        painter.update(sim.getPeople());
+        painter.update(sim.getPeople(), sim.getSensors());
         box.add(menubox);
         add(box);
         ActionListener timeListen = new ActionListener() {
@@ -128,8 +131,10 @@ public class MainFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if(!sim.simulationStep()) tim.setDelay(fastSpeed);
-                else tim.setDelay(slowSpeed);
-                painter.update(sim.getPeople());
+                else{
+                    tim.setDelay(slowSpeed);
+                    painter.update(sim.getPeople(), sim.getSensors());
+                }
                 updateMenu();
             }
         };

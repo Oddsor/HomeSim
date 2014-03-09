@@ -1,0 +1,44 @@
+{
+    "Sensors": [
+        {
+            "Name": "KitchenCamera",
+            "Position": [290,415],
+            "Type": "Camera",
+            "Direction": 290,
+            "FieldOfView": 57,
+            "Range": [100, 250]
+        },{
+            "Name": "KitchenTable",
+            "Position": [122,267],
+            "Type": "MotionSensor",
+            "Radius": 60
+        },{
+            "Name": "Living Room Camera",
+            "Position": [310, 408],
+            "Type": "Camera",
+            "Direction": 0,
+            "FieldOfView": 57,
+            "Range": [60, 250]
+        },{
+            "Name": "Entry Door",
+            "Position": [101, 646],
+            "Type": "Door",
+            "Size": [15, 50]
+        },{
+            "Name": "Bathroom Door",
+            "Position": [162,545],
+            "Type": "Door",
+            "Size": [15,50]
+        },{
+            "Name": "Washing room Door",
+            "Position": [219,482],
+            "Type": "Door",
+            "Size": [10,40]
+        },{
+            "Name": "Living Room Table sensor",
+            "Position": [314,251],
+            "Type": "MotionSensor",
+            "Radius": 60
+        }
+    ]
+}

@@ -7,6 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oddsor.AStarMulti.AStarMulti;
 import no.oddsor.simulator3.json.JSON;
+import no.oddsor.simulator3.json.SensorReader;
+import no.oddsor.simulator3.sensor.Sensor;
 
 /**
  *
@@ -15,6 +17,7 @@ import no.oddsor.simulator3.json.JSON;
 public class Simulator {
     
     Collection<Person> people;
+    Collection<Sensor> sensors;
     SimulationMap map;
     ArrayList<Task> tasks;
     
@@ -40,6 +43,11 @@ public class Simulator {
             j = new JSON("tasks.json");
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+        try {
+            sensors = new SensorReader("sensors.json").getSensors();
+        } catch (Exception ex) {
+            Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.taskManager = new TaskManager(j);
     }
@@ -92,5 +100,9 @@ public class Simulator {
     
     public Collection<Person> getPeople(){
         return people;
+    }
+    
+    public Collection<Sensor> getSensors(){
+        return sensors;
     }
 }

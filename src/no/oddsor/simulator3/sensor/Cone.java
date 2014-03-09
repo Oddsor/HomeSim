@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package no.oddsor.simulator3;
+package no.oddsor.simulator3.sensor;
 
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
@@ -18,35 +18,45 @@ import java.util.logging.Logger;
  */
 class Cone {
     private final Point2D origin;
-    private final int directionDegrees;
-    private final int[] range;
-    private final int fieldOfView;
+    private final double directionDegrees;
+    private final double[] range;
+    private final double fieldOfView;
     
-    public Cone(Point2D origin, int directionDegrees, int[] range, int fieldOfView){
+    public Cone(Point2D origin, double directionDegrees, double [] range, double fieldOfView){
         this.origin = origin;
         this.directionDegrees = directionDegrees;
         this.range = range;
-        if(range.length != 2) try {
-            throw new Exception("Range should contain a minimum and maximum size");
+        if(range.length > 2 || range.length < 1) try {
+            throw new Exception("Range should not have more than two values or less than one");
         } catch (Exception ex) {
             Logger.getLogger(Cone.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.fieldOfView = fieldOfView;
     }
     
+    public Cone(Point2D origin, double directionDegrees, double range, double fieldOfView){
+        this.origin = origin;
+        this.directionDegrees = directionDegrees;
+        this.range = new double[]{range};
+        this.fieldOfView = fieldOfView;
+    }
+    
     public Shape getShape(){
         Shape mainArc = new Arc2D.Double(
-                new Rectangle2D.Double(origin.getX() - range[1], 
-                        origin.getY() - range[1], 
-                        range[1] * 2, range[1] * 2), 
+                new Rectangle2D.Double(origin.getX() - range[range.length - 1], 
+                        origin.getY() - range[range.length - 1], 
+                        range[range.length - 1] * 2, range[range.length - 1] * 2), 
                 90 - (directionDegrees - fieldOfView / 2), -fieldOfView, Arc2D.PIE);
-        Shape subtract = new Arc2D.Double(
+        Area cone = new Area(mainArc);
+        if(range.length == 2){
+            Shape subtract = new Arc2D.Double(
                 new Rectangle2D.Double(origin.getX() - range[0], 
                         origin.getY() - range[0], 
                         range[0] * 2, range[0] * 2), 
                 90 - (directionDegrees - (fieldOfView + 4) / 2), -(fieldOfView + 4), Arc2D.PIE);
-        Area cone = new Area(mainArc);
-        cone.subtract(new Area(subtract));
+        
+            cone.subtract(new Area(subtract));
+        }
         return cone;
     }
 }

@@ -2,14 +2,17 @@
 package no.oddsor.simulator3;
 
 import com.almworks.sqlite4java.SQLiteConnection;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import no.oddsor.simulator3.sensor.Sensor;
+import no.oddsor.simulator3.sensor.SensorArea;
 
 /**
  *
@@ -17,23 +20,24 @@ import javax.swing.JPanel;
  */
 public class SimulationDisplay extends JPanel{
     
-    private Point startPoint;
     private Image image;
     private SQLiteConnection db;
+    private Collection<Sensor> sensors;
     private Collection<Person> people;
 
-    public SimulationDisplay(String mapName, Point startPoint, SQLiteConnection db) {
-        this.startPoint = startPoint;
+    public SimulationDisplay(String mapName, SQLiteConnection db) {
         this.db = db;
         image = new ImageIcon(getClass().getResource(mapName)).getImage();
         Dimension size = new Dimension(image.getWidth(this), image.getHeight(this));
         setPreferredSize(size);
         people = null;
+        sensors = null;
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g); //To change body of generated methods, choose Tools | Templates.
+        Graphics2D g2d = (Graphics2D) g;
         g.drawImage(image, 0, 0, image.getWidth(this), image.getHeight(this), this);
         if(people != null){
             for(Person person: people){
@@ -42,10 +46,33 @@ public class SimulationDisplay extends JPanel{
                     person.avatarImg.getWidth(this), person.avatarImg.getHeight(this), this);
             }
         }
+        if(sensors != null){
+            for(Sensor sensor: sensors){
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(sensor.getPosition().x - 1, sensor.getPosition().y - 1, 
+                        2, 2);
+                for(SensorArea s: sensor.getSensorAreas()){
+                    boolean steppedOn = false;
+                    if(people != null){
+                        for(Person p: people){
+                            if(s.getArea().contains(p.currentLocation())){
+                                steppedOn = true;
+                            }
+                        }
+                    }
+                    if(steppedOn) g2d.setColor(new Color(0, 255, 0, 50));
+                    else g2d.setColor(new Color(255, 255, 0, 50));
+                    g2d.fill(s.getArea());
+                    g2d.setColor(Color.BLACK);
+                    g2d.draw(s.getArea());
+                }
+            }
+        }
     }
     
-    public void update(Collection<Person> people){
+    public void update(Collection<Person> people, Collection<Sensor> sensors){
         this.people = people;
+        this.sensors = sensors;
         repaint();
     }
 }
