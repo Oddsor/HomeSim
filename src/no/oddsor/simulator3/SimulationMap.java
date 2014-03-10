@@ -22,6 +22,7 @@ public class SimulationMap {
     
     public final String mapName;
     public final int startNodeId;
+    public final int dotsPerMeter;
     
     private ArrayList<Node> nodes;
     private final Collection<Person> people;
@@ -29,10 +30,11 @@ public class SimulationMap {
     public Collection<Item> items;
     
     public SimulationMap(String mapName, int walkingDistancePerSec, int startId, 
-            Collection<Person> people, SQLiteConnection db){
+            Collection<Person> people, int dotsPerMeter, SQLiteConnection db){
         this.mapName = mapName;
         this.people = people;
         this.walkingSpeedPerSec = walkingDistancePerSec;
+        this.dotsPerMeter = dotsPerMeter;
         this.startNodeId = startId;
         if(db != null) this.nodes = Node.getNodes(db);
         else nodes = new ArrayList<>();
@@ -138,7 +140,7 @@ public class SimulationMap {
     }
     
     public static void main(String[] args){
-        SimulationMap map = new  SimulationMap("", 5, 1, null, null);
+        SimulationMap map = new  SimulationMap("", 5, 1, null, 43, null);
         map.addItem(new Item("Wares", null));
         Task t = new Task("ye", "s", 1, null);
         t.addRequiredItem("Wares", 1);

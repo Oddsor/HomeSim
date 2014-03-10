@@ -13,6 +13,65 @@
             "Type": "MotionSensor",
             "Radius": 60
         },{
+            "Name": "Kitchen",
+            "Position": [120,366],
+            "Type": "MotionSensor",
+            "Radius": 60
+        },{
+            "Name": "Bedroom 1 roof",
+            "Position": [392, 647],
+            "Type": "MotionSensor",
+            "Radius": 60
+        },{
+            "Name": "Bedroom 2 roof",
+            "Position": [395, 483],
+            "Type": "MotionSensor",
+            "Radius": 60,
+            "Confine":[[312,443], [467,443], [467, 531], [310, 531]]
+        },{
+            "Name": "Livingroom",
+            "Position": [379,301],
+            "Type": "MotionSensor",
+            "FieldOfView": 150,
+            "Direction": 270,
+            "Range": 300,
+            "Exclude":[{
+                    "Edge": [226,434],
+                    "Direction": "Southwest"
+            },{
+                "Edge": [277, 431],
+                "Direction": "Southeast"
+            },{
+                "Edge": [216, 144],
+                "Direction": "Northwest"
+            },{
+                "Edge": [223,443],
+                "Direction": "Southeast"
+            }]
+        },{
+            "Name": "PC room",
+            "Position": [424,357],
+            "Type": "MotionSensor",
+            "Radius": 60,
+            "Exclude":[{
+                "Edge":[380,425],
+                "Direction": "Northwest"
+            }]
+        },{
+            "Name": "Bathroom",
+            "Position": [158,623],
+            "Type": "MotionSensor",
+            "FieldOfView": 80,
+            "Direction": 320,
+            "Range": 500,
+            "Exclude": [{
+                "Edge": [224,455],
+                "Direction": "Northwest"
+            },{
+                "Edge": [46,638],
+                "Direction": "Northwest"
+            }]
+        },{
             "Name": "Living Room Camera",
             "Position": [310, 408],
             "Type": "Camera",
@@ -39,6 +98,16 @@
             "Position": [314,251],
             "Type": "MotionSensor",
             "Radius": 60
+        },{
+            "Name": "Bedroom 2 Door",
+            "Position": [303,451],
+            "Type": "Door",
+            "Size": [10,40]
+        },{
+            "Name": "Bedroom 1 Door",
+            "Position": [275,587],
+            "Type": "Door",
+            "Size": [10,40]
         }
     ]
 }

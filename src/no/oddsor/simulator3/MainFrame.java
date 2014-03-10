@@ -69,7 +69,7 @@ public class MainFrame extends JFrame{
             JSON j = new JSON("Tasks.json");
             people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0), j.getNeeds()));
             //people.add(new Person("Obama", "obama-head.png", new Point(0, 0), j.getNeeds()));
-            SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, people, db);
+            SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, people, 43, db);
             sim = new Simulator(map, 3);
             Collection<Sensor> sensors = new SensorReader("sensors.json").getSensors();
             painter = new SimulationDisplay("appsketch.jpg", db);

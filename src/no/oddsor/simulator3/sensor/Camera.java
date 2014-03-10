@@ -2,6 +2,10 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package no.oddsor.simulator3.sensor;
@@ -32,7 +36,7 @@ public class Camera implements Sensor{
         //Cone cone = new Cone(position, directionDegrees, range, fieldOfView);
         this.name = name;
         this.position = position;
-        areas = getSegments(position, directionDegrees, fieldOfView, range, 2);
+        areas = getSegments(position, directionDegrees, fieldOfView, range, 5);
     }
     
     private List<SensorArea> getSegments(Point position, double direction, double fov, double[] range, int partitions){
@@ -75,5 +79,12 @@ public class Camera implements Sensor{
     public Point getPosition() {
         return position;
     }
-    
+
+    @Override
+    public void confineToArea(Area area) {
+        for(SensorArea sa: areas){
+            sa.getArea().intersect(area);
+            if(sa.getArea().isEmpty()) areas.remove(sa);
+        }
+    }
 }

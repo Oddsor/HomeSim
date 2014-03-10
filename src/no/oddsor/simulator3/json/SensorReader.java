@@ -8,6 +8,7 @@ package no.oddsor.simulator3.json;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.io.FileReader;
@@ -74,34 +75,49 @@ public class SensorReader {
                                     Double.parseDouble(sensorObject.get("Radius").toString()));
                     else{
                         sensor = new MotionSensor(name, location, 
-                                (double) sensorObject.get("Direction"), 
-                                (double) sensorObject.get("Range"), 
-                                (double) sensorObject.get("FieldOfView"));
+                                Double.parseDouble(sensorObject.get("Direction").toString()), 
+                                Double.parseDouble(sensorObject.get("Range").toString()), 
+                                Double.parseDouble(sensorObject.get("FieldOfView").toString()));
                     }
             }
             if(sensorObject.containsKey("Exclude")){
-                JSONObject exclud = (JSONObject) sensorObject.get("Exclude");
-                JSONArray edgeArray = (JSONArray) exclud.get("Edge");
-                Point edgeLocation = new Point(Integer.parseInt(edgeArray.get(0).toString()), 
-                    Integer.parseInt(edgeArray.get(1).toString()));
-                String direction = (String) exclud.get("Direction");
-                Point edge = null;
-                Dimension dim = new Dimension(1000, 1000);
-                switch(direction){
-                    case ("Northeast"): 
-                        edge = new Point(edgeLocation.x, edgeLocation.y - 1000);
-                        break;
-                    case ("Northwest"): 
-                        edge = new Point(edgeLocation.x - 1000, edgeLocation.y - 1000);
-                        break;
-                    case ("Southeast"): 
-                        edge = new Point(edgeLocation.x, edgeLocation.y);
-                        break;
-                    case ("Southwest"): 
-                        edge = new Point(edgeLocation.x - 1000, edgeLocation.y);
+                JSONArray excludeArray = (JSONArray) sensorObject.get("Exclude");
+                for(Object exclude: excludeArray){
+                    JSONObject exclud = (JSONObject) exclude;
+                    JSONArray edgeArray = (JSONArray) exclud.get("Edge");
+                    Point edgeLocation = new Point(Integer.parseInt(edgeArray.get(0).toString()), 
+                        Integer.parseInt(edgeArray.get(1).toString()));
+                    String direction = (String) exclud.get("Direction");
+                    Point edge = null;
+                    Dimension dim = new Dimension(1000, 1000);
+                    switch(direction){
+                        case ("Northeast"): 
+                            edge = new Point(edgeLocation.x, edgeLocation.y - 1000);
+                            break;
+                        case ("Northwest"): 
+                            edge = new Point(edgeLocation.x - 1000, edgeLocation.y - 1000);
+                            break;
+                        case ("Southeast"): 
+                            edge = new Point(edgeLocation.x, edgeLocation.y);
+                            break;
+                        case ("Southwest"): 
+                            edge = new Point(edgeLocation.x - 1000, edgeLocation.y);
+                    }
+                    Rectangle exluTangle = new Rectangle(edge, dim);
+                    sensor.removeArea(new Area(exluTangle));
                 }
-                Rectangle exluTangle = new Rectangle(edge, dim);
-                sensor.removeArea(new Area(exluTangle));
+            }if(sensorObject.containsKey("Confine")){
+                JSONArray coords = (JSONArray) sensorObject.get("Confine");
+                int[] x = new int[coords.size()];
+                int[] y = new int[coords.size()];
+                for(int i = 0; i < coords.size(); i++){
+                    JSONArray coord = (JSONArray) coords.get(i);
+                    x[i] = Integer.parseInt(coord.get(0).toString());
+                    y[i] = Integer.parseInt(coord.get(1).toString());
+                }
+                Polygon p = new Polygon(x, y, coords.size());
+                Area excluPoly = new Area(p);
+                sensor.confineToArea(excluPoly);
             }
             sensors.add(sensor);
         }

@@ -3,12 +3,16 @@ package no.oddsor.simulator3;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oddsor.AStarMulti.AStarMulti;
 import no.oddsor.simulator3.json.JSON;
 import no.oddsor.simulator3.json.SensorReader;
 import no.oddsor.simulator3.sensor.Sensor;
+import no.oddsor.simulator3.sensor.SensorArea;
 
 /**
  *
@@ -20,6 +24,7 @@ public class Simulator {
     Collection<Sensor> sensors;
     SimulationMap map;
     ArrayList<Task> tasks;
+    Map<SensorArea, Double> recentlyTriggered;
     
     int simsPerSec;
     public Time time;
@@ -50,6 +55,7 @@ public class Simulator {
             Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.taskManager = new TaskManager(j);
+        this.recentlyTriggered = new HashMap<>();
     }
     
     /**
@@ -84,12 +90,28 @@ public class Simulator {
             }else{
                 if(Math.random() < 0.25){
                     try {
+                        System.out.println(person.name + " chooses to wander a bit.");
                         person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }else{
                     taskManager.findTask(person, map, currentTime);
+                }
+            }
+            for(SensorArea sa: recentlyTriggered.keySet()){
+                double newVal = recentlyTriggered.get(sa) - 1.0/simsPerSec;
+                if(newVal < 0.0) newVal = 0.0;
+                recentlyTriggered.put(sa, newVal);
+            }
+            for(Sensor s: sensors){
+                for(SensorArea sa: s.getSensorAreas()){
+                    if(sa.getArea().contains(person.currentLocation())){
+                        if(!recentlyTriggered.containsKey(sa) || (recentlyTriggered.get(sa) != null && recentlyTriggered.get(sa) < 0.0)){
+                            recentlyTriggered.put(sa, 5.0);
+                            //TODO ADD save to database
+                        }
+                    }
                 }
             }
             person.passTime(1.0/simsPerSec);

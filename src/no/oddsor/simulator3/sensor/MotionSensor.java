@@ -2,6 +2,10 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package no.oddsor.simulator3.sensor;
@@ -17,19 +21,23 @@ import java.util.List;
  */
 public class MotionSensor implements Sensor{
     
-    private String name;
-    private Point location;
-    private Area area;
+    private final String name;
+    private final Point location;
+    private final Area area;
+    private final SensorArea sa;
 
     public MotionSensor(String name, Point location, double radian) {
         this.name = name;
         this.location = location;
         this.area = new Area(new Circle(location, radian).getShape());
+        this.sa = new SensorArea(name, area);
     }
 
     public MotionSensor(String name, Point location, double directionDegrees, double range, double fieldOfView) {
         this.name = name;
+        this.location = location;
         this.area = new Area(new Cone(location, directionDegrees, range, fieldOfView).getShape());
+        this.sa = new SensorArea(name, area);
     }
 
     @Override
@@ -40,7 +48,7 @@ public class MotionSensor implements Sensor{
     @Override
     public List<SensorArea> getSensorAreas() {
         ArrayList<SensorArea> l = new ArrayList<>();
-        l.add(new SensorArea(name, area));
+        l.add(sa);
         
         return l;
     }
@@ -53,6 +61,11 @@ public class MotionSensor implements Sensor{
     @Override
     public Point getPosition() {
         return location;
+    }
+
+    @Override
+    public void confineToArea(Area area) {
+        this.area.intersect(area);
     }
     
 }
