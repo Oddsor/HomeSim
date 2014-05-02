@@ -5,15 +5,15 @@
 			"Type": "Automatic",
 			"Appliance": "WashingMachine",
 			"Duration": 120,
-			"Requires": ["Laundry", 10],
-			"Creates": "WashedLaundry"
+			"RequiresItem": ["Laundry", 10],
+			"Creates": "WashedLaundry",
 		},
 		{
 			"Name": "Dry laundry",
 			"Type": "Automatic",
 			"Appliance": "Tumbler",
 			"Duration": 120,
-			"Requires": "WashedLaundry",
+			"RequiresItem": "WashedLaundry",
 			"Creates": "DryLaundry"
 		},
 		{
@@ -21,12 +21,12 @@
 			"Type": "Finite",
 			"Duration": 1,
 			"Appliance": "Closet",
-			"Requires": "DryLaundry"
+			"RequiresItem": "DryLaundry"
 		},
 		{
 			"Name": "Watch TV",
 			"Type": "Infinite",
-			"Duration": -1,
+			"Duration": 60,
 			"Appliance": "Sofa",
 			"IncreasesNeed": ["Fun", 5]
 		},
@@ -43,14 +43,14 @@
 			"Timespan": [16,20],
 			"Appliance": "Oven",
 			"Duration": 5,
-			"Requires": "Ingredients",
-			"Creates": ["Food", 2]
+			"RequiresItem": "Ingredients",
+			"Creates": "Food"
 		},
 		{
 			"Name": "Make food",
 			"Type": "Finite",
 			"Appliance": "Bench",
-			"Requires": "Ingredients",
+			"RequiresItem": "Ingredients",
 			"Duration": 2,
 			"Timespan": [20,16],
 			"Creates": "Food"
@@ -60,7 +60,7 @@
 			"Type": "Finite",
 			"Appliance": "Chair",
 			"Duration": 10,
-			"Requires": ["Food", "Utensils", "Plate"],
+			"RequiresItem": ["Food", "Utensils", "Plate"],
 			"Creates": "DirtyDishes",
 			"IncreasesNeed": ["Hunger", 100]
 		},
@@ -69,7 +69,7 @@
 			"Type": "Automatic",
 			"Duration": 1,
 			"Appliance": "Dishwasher",
-			"Requires": ["DirtyDishes", 10]
+			"RequiresItem": ["DirtyDishes", 10]
 		},
 		{
 			"Name": "Shower",
@@ -77,7 +77,8 @@
 			"Duration": 5,
 			"Appliance": "Shower",
 			"IncreasesNeed": ["Hygiene", 100],
-			"Creates": "Laundry"
+			"Creates": "Laundry",
+			"SetsPersonal": "-Dressed"
 		},
 		{ 
 			"Name": "Go to the toilet",
@@ -88,12 +89,12 @@
 		},
 		{
 			"Name": "Read book",
-			"Type": "Infinite",
-			"Duration": -1,
+			"Type": "Finite",
+			"Duration": 10,
 			"Appliance": "Sofa",
 			"IncreasesNeed": ["Fun", 5],
 			"Timespan": [9, 23],
-			"Requires": "Book"
+			"RequiresItem": "Book"
 		},
 		{
 			"Name": "Find book",
@@ -115,7 +116,7 @@
 			"Type": "Finite",
 			"Appliance": "Refridgerator",
 			"Duration": 1
-			"Requires": "Wares",
+			"RequiresItem": "Wares",
 			"Creates": ["Ingredients", 15]
 		},
 		{

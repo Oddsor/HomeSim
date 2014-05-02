@@ -108,6 +108,42 @@
             "Position": [275,587],
             "Type": "Door",
             "Size": [10,40]
+        },{
+            "Name": "Refridgerator sensor",
+            "Attached_to": "Refridgerator",
+            "Type": "Contact"
+        },{
+            "Name": "Dishwasher sensor",
+            "Attached_to": "Dishwasher",
+            "Type": "Contact"
+        },{
+            "Name": "Tumbler sensor",
+            "Attached_to": "Tumbler",
+            "Type": "Contact"
+        },{
+            "Name": "Washer sensor",
+            "Attached_to": "WashingMachine",
+            "Type": "Contact"
+        },{
+            "Name": "Drawer sensor",
+            "Attached_to": "Drawer",
+            "Type": "Contact"
+        },{
+            "Name": "Cabiner sensor",
+            "Attached_to": "Cabinet",
+            "Type": "Contact"
+        },{
+            "Name": "Oven sensor",
+            "Attached_to": "Oven",
+            "Type": "Contact"
+        },{
+            "Name": "Closet sensor",
+            "Attached_to": "Closet",
+            "Type": "Contact"
+        },{
+            "Name": "Bookshelf sensor",
+            "Attached_to": "Bookshelf",
+            "Type": "Contact"
         }
     ]
 }

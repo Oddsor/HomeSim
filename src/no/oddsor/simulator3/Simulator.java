@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oddsor.AStarMulti.AStarMulti;
@@ -105,6 +104,10 @@ public class Simulator {
                 recentlyTriggered.put(sa, newVal);
             }
             for(Sensor s: sensors){
+                if(s.getSensorAreas() == null){
+                    //IS CONTACT SENSOR
+                    //TODO trigger by using appliance
+                }
                 for(SensorArea sa: s.getSensorAreas()){
                     if(sa.getArea().contains(person.currentLocation())){
                         if(!recentlyTriggered.containsKey(sa) || (recentlyTriggered.get(sa) != null && recentlyTriggered.get(sa) < 0.0)){
