@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import no.oddsor.simulator3.sensor.Camera;
+import no.oddsor.simulator3.sensor.Contact;
 import no.oddsor.simulator3.sensor.Door;
 import no.oddsor.simulator3.sensor.MotionSensor;
 import no.oddsor.simulator3.sensor.Sensor;
@@ -45,9 +46,16 @@ public class SensorReader {
             String type = (String) sensorObject.get("Type");
             String name = (String) sensorObject.get("Name");
             JSONArray locationArray = (JSONArray) sensorObject.get("Position");
-            Point location = new Point(Integer.parseInt(locationArray.get(0).toString()), 
-                Integer.parseInt(locationArray.get(1).toString()));
+            Point location = null;
+            if(locationArray != null){
+                location = new Point(Integer.parseInt(locationArray.get(0).toString()), 
+                    Integer.parseInt(locationArray.get(1).toString()));
+            }
             switch(type){
+                case "Contact":
+                    String attached = (String) sensorObject.get("Attached_to");
+                    sensor = new Contact(name, attached);
+                    break;
                 case "Camera": 
                     JSONArray range = (JSONArray) sensorObject.get("Range");
                     double[] dArray = new double[range.size()];

@@ -9,10 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import no.oddsor.simulator3.json.JSON;
@@ -118,12 +122,12 @@ public class MainFrame extends JFrame{
                 designer.setVisible(true);
             }
         });
-        bottomButtonBox.add(new JButton("Start sim"));
         bottomButtonBox.add(editButton);
         box.add(painter);
         painter.update(sim.getPeople(), sim.getSensors());
         box.add(menubox);
         add(box);
+        final JTextField filenameField = new JTextField("sensorvals", 10);
         ActionListener timeListen = new ActionListener() {
             int slowSpeed = 10;
             int fastSpeed = 1;
@@ -144,9 +148,16 @@ public class MainFrame extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent ae) {
+                try {
+                    sim.setSensorLogger(new SensorLogger(filenameField.getText()));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 tim.start();
             }
         });
+        menubox.add(filenameField);
         menubox.add(startStop);
         pack();
     }

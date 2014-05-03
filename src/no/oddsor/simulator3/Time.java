@@ -33,6 +33,10 @@ public class Time {
     }
     
     public static int getDay(double currentTime){
+        return 1 + (int) ((currentTime) / (60*60*24));
+    }
+    
+    public static int getDayOfWeek(double currentTime){
         return 1 + (int) ((currentTime) / (60*60*24)) % 7;
     }
     

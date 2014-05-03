@@ -10,10 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- * @author Odd
- */
+
 public class Task implements ITask{
 
     String fulfilledNeed;
@@ -202,5 +199,10 @@ public class Task implements ITask{
         double tim = 80000;
         System.out.println(Time.getHours(tim));
         System.out.println(t.available(tim));
+    }
+
+    @Override
+    public String name() {
+        return taskName;
     }
 }

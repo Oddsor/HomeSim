@@ -39,4 +39,6 @@ public interface ITask {
     public void completeTask(Person p, SimulationMap map);
     
     public void consumeItem(Person p);
+    
+    public String name();
 }

@@ -13,6 +13,16 @@ import java.util.List;
 
 public class Contact implements Sensor{
     private String name;
+    private String attached;
+    
+    public Contact(String name, String attached){
+        this.name = name;
+        this.attached = attached;
+    }
+    
+    public String getAttached(){
+        return attached;
+    }
 
     @Override
     public String getName() {

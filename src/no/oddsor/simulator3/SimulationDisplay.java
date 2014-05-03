@@ -10,6 +10,7 @@ import java.awt.Image;
 import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import no.oddsor.simulator3.sensor.Contact;
 import no.oddsor.simulator3.sensor.Sensor;
 import no.oddsor.simulator3.sensor.SensorArea;
 
@@ -47,23 +48,25 @@ public class SimulationDisplay extends JPanel{
         }
         if(sensors != null){
             for(Sensor sensor: sensors){
-                g2d.setColor(Color.BLACK);
-                g2d.fillRect(sensor.getPosition().x - 1, sensor.getPosition().y - 1, 
-                        2, 2);
-                for(SensorArea s: sensor.getSensorAreas()){
-                    boolean steppedOn = false;
-                    if(people != null){
-                        for(Person p: people){
-                            if(s.getArea().contains(p.currentLocation())){
-                                steppedOn = true;
+                if(!(sensor instanceof Contact)){
+                    g2d.setColor(Color.BLACK);
+                    g2d.fillRect(sensor.getPosition().x - 1, sensor.getPosition().y - 1, 
+                            2, 2);
+                    for(SensorArea s: sensor.getSensorAreas()){
+                        boolean steppedOn = false;
+                        if(people != null){
+                            for(Person p: people){
+                                if(s.getArea().contains(p.currentLocation())){
+                                    steppedOn = true;
+                                }
                             }
                         }
+                        if(steppedOn) g2d.setColor(new Color(0, 255, 0, 50));
+                        else g2d.setColor(new Color(255, 255, 0, 50));
+                        g2d.fill(s.getArea());
+                        g2d.setColor(Color.BLACK);
+                        g2d.draw(s.getArea());
                     }
-                    if(steppedOn) g2d.setColor(new Color(0, 255, 0, 50));
-                    else g2d.setColor(new Color(255, 255, 0, 50));
-                    g2d.fill(s.getArea());
-                    g2d.setColor(Color.BLACK);
-                    g2d.draw(s.getArea());
                 }
             }
         }

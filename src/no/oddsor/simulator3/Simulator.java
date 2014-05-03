@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,10 +14,7 @@ import no.oddsor.simulator3.json.SensorReader;
 import no.oddsor.simulator3.sensor.Sensor;
 import no.oddsor.simulator3.sensor.SensorArea;
 
-/**
- *
- * @author Odd
- */
+
 public class Simulator {
     
     Collection<Person> people;
@@ -29,15 +27,16 @@ public class Simulator {
     public Time time;
     public double currentTime;
     private final TaskManager taskManager;
+    private SensorLogger sensorlogger;
     
     /**
      *
      * @param map
-     * @param people
      * @param simulationsPerSec
      */
     public Simulator(SimulationMap map, int simulationsPerSec){
         this.map = map;
+        this.sensorlogger = null;
         this.people = map.getPeople();
         this.simsPerSec = simulationsPerSec;
         this.time = new Time(0);
@@ -55,6 +54,10 @@ public class Simulator {
         }
         this.taskManager = new TaskManager(j);
         this.recentlyTriggered = new HashMap<>();
+    }
+    
+    public void setSensorLogger(SensorLogger sl){
+        this.sensorlogger = sl;
     }
     
     /**
@@ -99,20 +102,55 @@ public class Simulator {
                 }
             }
             for(SensorArea sa: recentlyTriggered.keySet()){
-                double newVal = recentlyTriggered.get(sa) - 1.0/simsPerSec;
-                if(newVal < 0.0) newVal = 0.0;
+                double oldVal = recentlyTriggered.get(sa);
+                double newVal = oldVal - 1.0/simsPerSec;
+                if(newVal < 0.0){
+                    newVal = 0.0;
+                    if(oldVal > 0.0){
+                        try {
+                            if(person.getCurrentTask() == null){
+                                sensorlogger.addSensor(currentTime, sa.getName(),
+                                    sa.getName(), "OFF",
+                                    "Other_Activity");
+                            }else{
+                                sensorlogger.addSensor(currentTime, sa.getName(),
+                                    sa.getName(), "OFF",
+                                    person.getCurrentTask().name());
+                            }
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
                 recentlyTriggered.put(sa, newVal);
+
             }
             for(Sensor s: sensors){
                 if(s.getSensorAreas() == null){
                     //IS CONTACT SENSOR
                     //TODO trigger by using appliance
-                }
-                for(SensorArea sa: s.getSensorAreas()){
-                    if(sa.getArea().contains(person.currentLocation())){
-                        if(!recentlyTriggered.containsKey(sa) || (recentlyTriggered.get(sa) != null && recentlyTriggered.get(sa) < 0.0)){
-                            recentlyTriggered.put(sa, 5.0);
-                            //TODO ADD save to database
+                }else{
+                    for(SensorArea sa: s.getSensorAreas()){
+                        if(sa.getArea().contains(person.currentLocation())){
+                            if(!recentlyTriggered.containsKey(sa) || 
+                                    (recentlyTriggered.get(sa) != null && recentlyTriggered.get(sa) <= 0.0)){
+                                recentlyTriggered.put(sa, 5.0);
+                                try {
+                                    if(person.getCurrentTask() == null){
+                                    sensorlogger.addSensor(currentTime, sa.getName(),
+                                            sa.getName(), "ON",
+                                            "Other_Activity");
+                                    }else{
+                                        sensorlogger.addSensor(currentTime, sa.getName(),
+                                            sa.getName(), "ON",
+                                            person.getCurrentTask().name());
+                                    }
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
+                                    ex.printStackTrace();
+                                }
+                            }
                         }
                     }
                 }
