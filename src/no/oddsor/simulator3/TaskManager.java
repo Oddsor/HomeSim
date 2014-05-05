@@ -24,14 +24,18 @@ public class TaskManager {
         tasks = j.getTasks();
     }
     
-    public void findTask(Person person, SimulationMap map, double time){
+    public void findTask(Person person, SimulationMap map, double time)
+    {
         Collection<ITask> availableTasks = new ArrayList<>(filterAvailable(tasks, time));
         if(person.getGoalTask() != null && !person.getGoalTask().available(time)) person.setGoalTask(null);
-        if(person.getGoalTask() != null){
-            if(person.getGoalTask().personHasAllItems(person)){
+        if(person.getGoalTask() != null)
+        {
+            if(person.getGoalTask().personHasAllItems(person))
+            {
                 setTaskForPerson(person, person.getGoalTask(), map);
                 person.setGoalTask(null);
-            }else{
+            }else
+            {
                 if(person.getGoalTask().itemsExist(person, map)){
                     moveForItems(person, person.getGoalTask(), map);
                 }else{
@@ -57,7 +61,9 @@ public class TaskManager {
     }
     
     public void findTaskLoop(ITask currentTask, Person person, SimulationMap map){
-        if(currentTask.personHasAllItems(person)) setTaskForPerson(person, currentTask, map);
+        if(currentTask.personHasAllItems(person)){
+            setTaskForPerson(person, currentTask, map);
+        }
         else if(currentTask.itemsExist(person, map)){
             System.out.println("Yay, items found for " + currentTask.toString());
             moveForItems(person, currentTask, map);
@@ -110,12 +116,18 @@ public class TaskManager {
         System.out.println(person.name + " is doing task " + task.toString() + ", for " + person.getGoalTask().toString() + ", " + person.targetItem);
         task.consumeItem(person);
         try {
+            Collection<Appliance> apps = map.getAppliances();
+            Appliance chosenApp = null;
             Collection<Node> goals = map.getLocationAppliances(task.getUsedAppliances());
             for(Person p: map.getPeople()){
                 if(!p.equals(person) && p.getRoute() != null) goals.remove(p.getRoute().getLast());
             }
-            person.setRoute(AStarMulti.getRoute(goals, map.getClosestNode(person.currentLocation())));
-            if(map.getClosestNode(person.currentLocation()).equals(person.getRoute().getLast())) person.setRoute(null);
+            Node closestNode = map.getClosestNode(person.currentLocation());
+            person.setRoute(AStarMulti.getRoute(goals, closestNode));
+            for(Appliance app: apps){
+                if(app.getLocation().equals(person.getRoute().getLast())) person.setAppliance(app);
+            }
+            if(closestNode.equals(person.getRoute().getLast())) person.setRoute(null);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

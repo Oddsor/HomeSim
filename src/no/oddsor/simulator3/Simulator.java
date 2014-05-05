@@ -64,19 +64,26 @@ public class Simulator {
      * 
      * @return True if any player moved
      */
-    public boolean simulationStep(){
+    public boolean simulationStep()
+    {
         boolean movement = false;
-        for(Person person: people){
-            if(person.getRoute() != null){ //We're traveling!
+        for(Person person: people)
+        {
+            if(person.getRoute() != null)
+            {   //We're traveling!
                 person.setLocation(map.moveActor(person, simsPerSec));
                 movement = true;
-            }else if(person.getCurrentTask() != null){
+            }
+            else if(person.getCurrentTask() != null)
+            {
                 person.progressTask(1.0/simsPerSec);
                 if(person.remainingDuration() <= 0.0){
                     person.getCurrentTask().completeTask(person, map);
                     person.setCurrentTask(null);
                 }
-            }else if(person.getTargetItem() != null){
+            }
+            else if(person.getTargetItem() != null)
+            {
                 person.progressFetch(1.0/simsPerSec);
                 System.out.println("Fetching..");
                 if(person.getFetchTime() <= 0.0){
@@ -89,8 +96,10 @@ public class Simulator {
                         System.out.println("Trouble fetching item??");
                     }
                 }
-            }else{
-                if(Math.random() < 0.25){
+            }
+            else{
+                if(Math.random() < 0.25)
+                {
                     try {
                         System.out.println(person.name + " chooses to wander a bit.");
                         person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
@@ -127,29 +136,34 @@ public class Simulator {
 
             }
             for(Sensor s: sensors){
-                if(s.getSensorAreas() == null){
-                    //IS CONTACT SENSOR
-                    //TODO trigger by using appliance
-                }else{
-                    for(SensorArea sa: s.getSensorAreas()){
-                        if(sa.getArea().contains(person.currentLocation())){
-                            if(!recentlyTriggered.containsKey(sa) || 
-                                    (recentlyTriggered.get(sa) != null && recentlyTriggered.get(sa) <= 0.0)){
-                                recentlyTriggered.put(sa, 5.0);
-                                try {
-                                    if(person.getCurrentTask() == null){
+                for(SensorArea sa: s.getSensorAreas()){
+                    if(sa.getArea() == null && person.getUsingAppliance() != null && person.getRoute() == null){
+                        recentlyTriggered.put(s.getSensorAreas().get(0), 5.0);
+                        try {
+                            sensorlogger.addSensor(currentTime, sa.getName(),
+                                    sa.getName(), "ON", person.getCurrentTask().name());
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    if(sa.getArea().contains(person.currentLocation())){
+                        if(!recentlyTriggered.containsKey(sa) || 
+                                (recentlyTriggered.get(sa) != null && recentlyTriggered.get(sa) <= 0.0)){
+                            recentlyTriggered.put(sa, 5.0);
+                            try {
+                                if(person.getCurrentTask() == null){
+                                sensorlogger.addSensor(currentTime, sa.getName(),
+                                        sa.getName(), "ON",
+                                        "Other_Activity");
+                                }else{
                                     sensorlogger.addSensor(currentTime, sa.getName(),
-                                            sa.getName(), "ON",
-                                            "Other_Activity");
-                                    }else{
-                                        sensorlogger.addSensor(currentTime, sa.getName(),
-                                            sa.getName(), "ON",
-                                            person.getCurrentTask().name());
-                                    }
-                                } catch (IOException ex) {
-                                    Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
-                                    ex.printStackTrace();
+                                        sa.getName(), "ON",
+                                        person.getCurrentTask().name());
                                 }
+                            } catch (IOException ex) {
+                                Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
+                                ex.printStackTrace();
                             }
                         }
                     }

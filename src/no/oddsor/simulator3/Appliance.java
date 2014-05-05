@@ -47,4 +47,7 @@ public class Appliance{
     public String type(){
         return type;
     }
+    public String getName(){
+        return type+getLocation().id;
+    }
 }

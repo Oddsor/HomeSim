@@ -1,14 +1,16 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.tables.Node;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.ImageIcon;
+import no.oddsor.simulator3.tables.Node;
 
 /**
  *
@@ -29,6 +31,11 @@ public class Person{
     private final HashMap<String, Integer> inventory;
     public Image avatarImg;
     private ITask goalTask;
+    private Appliance usingAppliance;
+
+    public Appliance getUsingAppliance() {
+        return usingAppliance;
+    }
     
     public Person(String name, String avatarImage, Point currentLocation, List<Need> needs){
         this.name = name;
@@ -70,6 +77,10 @@ public class Person{
                 currentLocation.distance(route.peek().getLocation()) == 0){
             route.remove();
         }
+    }
+    
+    public void setAppliance(Appliance app){
+        this.usingAppliance = app;
     }
     
     public List<Need> getNeeds(){
@@ -133,5 +144,12 @@ public class Person{
     public void removeItem(String itemName, int amount){
         inventory.put(itemName, inventory.get(itemName) - amount);
         if(inventory.get(itemName) <= 0) inventory.remove(itemName);
+    }
+    
+    public Set<String> getPoseData(){
+        Set<String> poses = new HashSet<>();
+        //poses.addAll(currentTask.getPoses());
+        //poses.addAll(usingAppliance.getPoses());
+        return poses;
     }
 }

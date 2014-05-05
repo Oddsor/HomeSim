@@ -8,16 +8,20 @@ package no.oddsor.simulator3.sensor;
 
 import java.awt.Point;
 import java.awt.geom.Area;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class Contact implements Sensor{
     private String name;
     private String attached;
+    private List<SensorArea> sensorAreas;
     
     public Contact(String name, String attached){
         this.name = name;
         this.attached = attached;
+        sensorAreas = new ArrayList<>(1);
+        sensorAreas.add(new SensorArea(name, null));
     }
     
     public String getAttached(){
@@ -31,7 +35,7 @@ public class Contact implements Sensor{
 
     @Override
     public List<SensorArea> getSensorAreas() {
-        return null;
+        return sensorAreas;
     }
 
     @Override
