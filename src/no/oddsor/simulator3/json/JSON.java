@@ -56,11 +56,11 @@ public class JSON {
                 JSONArray need = (JSONArray) nextTask.get("IncreasesNeed");
                 newTask.addResult((String) need.get(0), 
                         Integer.parseInt(need.get(1).toString()));
-            }if(nextTask.containsKey("Requires")){
-                if(!(nextTask.get("Requires") instanceof JSONArray)){
-                    newTask.addRequiredItem((String) nextTask.get("Requires"), 1);
+            }if(nextTask.containsKey("RequiresItem")){
+                if(!(nextTask.get("RequiresItem") instanceof JSONArray)){
+                    newTask.addRequiredItem((String) nextTask.get("RequiresItem"), 1);
                 }else{
-                    JSONArray requirements = (JSONArray) nextTask.get("Requires");
+                    JSONArray requirements = (JSONArray) nextTask.get("RequiresItem");
                     if(requirements.get(1) instanceof Number){
                         newTask.addRequiredItem((String) requirements.get(0), 
                                 Integer.parseInt(requirements.get(1).toString()));
@@ -76,6 +76,31 @@ public class JSON {
                     newTask.addResultingItem((String) creates.get(0), 
                             Integer.parseInt(creates.get(1).toString()));
                 }else newTask.addResultingItem((String) nextTask.get("Creates"), 1);
+            }if(nextTask.containsKey("PoseFeatures")){
+                if(nextTask.get("PoseFeatures") instanceof JSONArray){
+                    JSONArray poses = (JSONArray) nextTask.get("PoseFeatures");
+                    for(Object pose: poses){
+                        String poseString = (String) pose;
+                        newTask.addPose(poseString);
+                    }
+                }
+            }if(nextTask.containsKey("NeedsState")){
+                if(nextTask.get("NeedsState") instanceof JSONArray){
+                    JSONArray poses = (JSONArray) nextTask.get("NeedsState");
+                    for(Object pose: poses){
+                        String poseString = (String) pose;
+                        newTask.addNeededState(poseString);
+                    }
+                }
+            }if(nextTask.containsKey("AddsState")){
+                if(nextTask.get("AddsState") instanceof JSONArray){
+                    JSONArray poses = (JSONArray) nextTask.get("AddsState");
+                    for(Object pose: poses){
+                        String poseString = (String) pose;
+                        if(poseString.charAt(0) == '+')newTask.addPlusState(poseString.substring(1));
+                        if(poseString.charAt(0) == '-')newTask.addMinusState(poseString.substring(1));
+                    }
+                }
             }
         }
         return tasks;

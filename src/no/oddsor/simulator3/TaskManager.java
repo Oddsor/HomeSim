@@ -1,14 +1,21 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.tables.Node;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.oddsor.AStarMulti.AStarMulti;
 import no.oddsor.simulator3.json.JSON;
+import no.oddsor.simulator3.planner.PPlanWrapper;
+import no.oddsor.simulator3.tables.Node;
+import plplan.javaapi.EnumAlgorithm;
+import plplan.javaapi.PLPlan;
 
 /**
  *
@@ -16,12 +23,33 @@ import no.oddsor.simulator3.json.JSON;
  */
 public class TaskManager {
     
-    private final JSON json;
     private final Collection<ITask> tasks;
     
     public TaskManager(JSON j){
-        this.json = j;
         tasks = j.getTasks();
+    }
+    
+    public static void main(String[] args){
+        JSON j = null;
+        try {
+            j = new JSON("tasks.json");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        Collection<ITask> tsk = j.getTasks();
+        System.out.println(tsk.size());
+        Person p = new Person("Oddser", "oddsurcut.png", null, null);
+        SimulationMap mss = new SimulationMap(null, 0, 0, null, 0, null);
+        ITask goal = null;
+        for(ITask task: tsk){
+            if(task.name().equals("Eat food")) goal = task;
+        }
+        try {
+            PPlanWrapper.getPlan(mss, p, tsk, goal);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Logger.getLogger(TaskManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void findTask(Person person, SimulationMap map, double time)
@@ -30,16 +58,22 @@ public class TaskManager {
         if(person.getGoalTask() != null && !person.getGoalTask().available(time)) person.setGoalTask(null);
         if(person.getGoalTask() != null)
         {
-            if(person.getGoalTask().personHasAllItems(person))
+            if(person.getGoalTask().personMeetsRequirements(person))
             {
                 setTaskForPerson(person, person.getGoalTask(), map);
                 person.setGoalTask(null);
-            }else
+            }else if(person.getGoalTask().getRequiredItems().size() > 0 && person.getGoalTask().itemsExist(person, map))
             {
-                if(person.getGoalTask().itemsExist(person, map)){
                     moveForItems(person, person.getGoalTask(), map);
-                }else{
-                    findTaskLoop(person.getGoalTask(), person, map);
+            }else{
+                try {
+                    System.out.println("Finding plan for " + person.getGoalTask().name());
+                    Deque<ITask> tusks = PPlanWrapper.getPlan(map, person, availableTasks, person.getGoalTask());
+                    tusks.toString();
+                    setTaskForPerson(person, tusks.getFirst(), map);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Logger.getLogger(TaskManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }else{
@@ -61,7 +95,7 @@ public class TaskManager {
     }
     
     public void findTaskLoop(ITask currentTask, Person person, SimulationMap map){
-        if(currentTask.personHasAllItems(person)){
+        if(currentTask.personMeetsRequirements(person)){
             setTaskForPerson(person, currentTask, map);
         }
         else if(currentTask.itemsExist(person, map)){
@@ -80,7 +114,7 @@ public class TaskManager {
     }
     
     public Collection<ITask> tasksForGoal(ITask goal, Person p, SimulationMap map){
-        System.out.println("Finding tasks for " + goal.toString());
+        System.out.println("Finding tasks for " + goal.toString() + " (reqs: " + goal.getRequiredItemsSet().toString() + ")");
         Collection<ITask> preTasks = new HashSet<>();
         for(ITask task: tasks){
             for(String str: task.getCreatedItems()){
@@ -112,20 +146,29 @@ public class TaskManager {
     }
     
     public void setTaskForPerson(Person person, ITask task, SimulationMap map){
-        person.setCurrentTask(task);
         System.out.println(person.name + " is doing task " + task.toString() + ", for " + person.getGoalTask().toString() + ", " + person.targetItem);
-        task.consumeItem(person);
         try {
             Collection<Appliance> apps = map.getAppliances();
-            Appliance chosenApp = null;
-            Collection<Node> goals = map.getLocationAppliances(task.getUsedAppliances());
+            Collection<String> valids = task.getUsedAppliances();
+            Set<Appliance> validApps = new HashSet<>();
+            for(Appliance app: apps){
+                for(String valid: valids){
+                    if(app.type().contains(valid)) validApps.add(app);
+                }
+            }
+            System.out.println("Validapps: " + validApps.size() + ", Valids: " + valids.size());
+            Collection<Node> goals = map.getLocationAppliances(valids);
             for(Person p: map.getPeople()){
                 if(!p.equals(person) && p.getRoute() != null) goals.remove(p.getRoute().getLast());
             }
             Node closestNode = map.getClosestNode(person.currentLocation());
             person.setRoute(AStarMulti.getRoute(goals, closestNode));
-            for(Appliance app: apps){
-                if(app.getLocation().equals(person.getRoute().getLast())) person.setAppliance(app);
+            for(Appliance app: validApps){
+                if(app.getLocation().equals(person.getRoute().getLast())){
+                    person.setCurrentTask(task, app);
+                    task.consumeItem(person);
+                    break;
+                }
             }
             if(closestNode.equals(person.getRoute().getLast())) person.setRoute(null);
         } catch (Exception ex) {
@@ -142,6 +185,7 @@ public class TaskManager {
             }
         }
         tasksForNeed = new ArrayList<>(filterAvailable(tasksForNeed, time));
+        System.out.println(tasksForNeed.size() + " possible tasks to fulfill " + need.name());
         return (tasksForNeed.isEmpty()? null: tasksForNeed.get(new Random().nextInt(tasksForNeed.size())));
     }
     

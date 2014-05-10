@@ -21,7 +21,7 @@ public class Simulator {
     Collection<Sensor> sensors;
     SimulationMap map;
     ArrayList<Task> tasks;
-    Map<SensorArea, Double> recentlyTriggered;
+    Map<String, Double> recentlyTriggered;
     
     int simsPerSec;
     public Time time;
@@ -69,7 +69,7 @@ public class Simulator {
         boolean movement = false;
         for(Person person: people)
         {
-            if(person.getRoute() != null)
+            if(person.isMoving())
             {   //We're traveling!
                 person.setLocation(map.moveActor(person, simsPerSec));
                 movement = true;
@@ -79,7 +79,7 @@ public class Simulator {
                 person.progressTask(1.0/simsPerSec);
                 if(person.remainingDuration() <= 0.0){
                     person.getCurrentTask().completeTask(person, map);
-                    person.setCurrentTask(null);
+                    person.setCurrentTask(null, null);
                 }
             }
             else if(person.getTargetItem() != null)
@@ -110,7 +110,7 @@ public class Simulator {
                     taskManager.findTask(person, map, currentTime);
                 }
             }
-            for(SensorArea sa: recentlyTriggered.keySet()){
+            for(String sa: recentlyTriggered.keySet()){
                 double oldVal = recentlyTriggered.get(sa);
                 double newVal = oldVal - 1.0/simsPerSec;
                 if(newVal < 0.0){
@@ -118,12 +118,12 @@ public class Simulator {
                     if(oldVal > 0.0){
                         try {
                             if(person.getCurrentTask() == null){
-                                sensorlogger.addSensor(currentTime, sa.getName(),
-                                    sa.getName(), "OFF",
+                                sensorlogger.addSensor(currentTime, sa,
+                                    sa, "OFF",
                                     "Other_Activity");
                             }else{
-                                sensorlogger.addSensor(currentTime, sa.getName(),
-                                    sa.getName(), "OFF",
+                                sensorlogger.addSensor(currentTime, sa,
+                                    sa, "OFF",
                                     person.getCurrentTask().name());
                             }
                         } catch (IOException ex) {
@@ -133,37 +133,42 @@ public class Simulator {
                     }
                 }
                 recentlyTriggered.put(sa, newVal);
-
             }
             for(Sensor s: sensors){
                 for(SensorArea sa: s.getSensorAreas()){
-                    if(sa.getArea() == null && person.getUsingAppliance() != null && person.getRoute() == null){
-                        recentlyTriggered.put(s.getSensorAreas().get(0), 5.0);
+                    if(sa.getArea() == null && person.getUsingAppliance() != null 
+                            && person.getRoute() == null && person.getCurrentTask() != null
+                            && sa.getName().contains(person.getUsingAppliance().type) &&
+                            (recentlyTriggered.containsKey(person.getUsingAppliance().getName()) && recentlyTriggered.get(person.getUsingAppliance().getName()) <= 0.0)){
+                        System.out.println(sa.getName() + ", " + sa.getName().equals(person.getUsingAppliance().type));
+                        System.out.println(person.getCurrentTask().name() + ", " + person.getUsingAppliance().type);
+                        recentlyTriggered.put(person.getUsingAppliance().getName(), 5.0);
                         try {
-                            sensorlogger.addSensor(currentTime, sa.getName(),
-                                    sa.getName(), "ON", person.getCurrentTask().name());
+                            sensorlogger.addSensor(currentTime, person.getUsingAppliance().getName(),
+                                    person.getUsingAppliance().getName(), "ON", person.getCurrentTask().name());
                         } catch (IOException ex) {
                             ex.printStackTrace();
                             Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    }
-                    if(sa.getArea().contains(person.currentLocation())){
-                        if(!recentlyTriggered.containsKey(sa) || 
-                                (recentlyTriggered.get(sa) != null && recentlyTriggered.get(sa) <= 0.0)){
-                            recentlyTriggered.put(sa, 5.0);
-                            try {
-                                if(person.getCurrentTask() == null){
-                                sensorlogger.addSensor(currentTime, sa.getName(),
-                                        sa.getName(), "ON",
-                                        "Other_Activity");
-                                }else{
+                    }else if(sa.getArea() != null){
+                        if(sa.getArea().contains(person.currentLocation())){
+                            if(!recentlyTriggered.containsKey(sa.getName()) || 
+                                    (recentlyTriggered.get(sa.getName()) != null && recentlyTriggered.get(sa.getName()) <= 0.0)){
+                                recentlyTriggered.put(sa.getName(), 5.0);
+                                try {
+                                    if(person.getCurrentTask() == null){
                                     sensorlogger.addSensor(currentTime, sa.getName(),
-                                        sa.getName(), "ON",
-                                        person.getCurrentTask().name());
+                                            sa.getName(), "ON",
+                                            "Other_Activity");
+                                    }else{
+                                        sensorlogger.addSensor(currentTime, sa.getName(),
+                                            sa.getName(), "ON",
+                                            person.getCurrentTask().name());
+                                    }
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
+                                    ex.printStackTrace();
                                 }
-                            } catch (IOException ex) {
-                                Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
-                                ex.printStackTrace();
                             }
                         }
                     }

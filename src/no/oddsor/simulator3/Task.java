@@ -27,6 +27,10 @@ public class Task implements ITask{
     double remainingSeconds;
     String performedAt;
     String type;
+    private final Set<String> poseSet;
+    private final Set<String> precond;
+    private final Set<String> pos;
+    private final Set<String> neg;
 
     public Task(String taskName, String type, int durationMinutes, String performedAt) {
         this.taskName = taskName;
@@ -40,6 +44,25 @@ public class Task implements ITask{
         fulfilledAmount = -1;
         resultingItem = new HashMap<>();
         requiredItem = new HashMap<>();
+        this.poseSet = new HashSet<>();
+        this.precond = new HashSet<>();
+        this.pos = new HashSet<>();
+        this.neg = new HashSet<>();
+    }
+
+    @Override
+    public Set<String> getPrecond() {
+        return precond;
+    }
+
+    @Override
+    public Set<String> getPos() {
+        return pos;
+    }
+
+    @Override
+    public Set<String> getNeg() {
+        return neg;
     }
     
     public Task(String taskName, String type, int durationSeconds,
@@ -48,6 +71,7 @@ public class Task implements ITask{
         this.startTime = startTime;
         this.endTime = endTime;
     }
+   
     
     public void addResult(String need, int amount){
         fulfilledNeed = need;
@@ -131,7 +155,16 @@ public class Task implements ITask{
     }
 
     @Override
-    public boolean personHasAllItems(Person person) {
+    public boolean personMeetsRequirements(Person person) {
+        return personHasItems(person) && personHasStates(person);
+    }
+    
+    private boolean personHasStates(Person person){
+        Set<String> personStates = person.getState();
+        return personStates.containsAll(precond);
+    }
+    
+    private boolean personHasItems(Person person){
         for(String item: requiredItem.keySet()){
             if(!person.hasItem(item, requiredItem.get(item))) return false;
         }
@@ -153,8 +186,8 @@ public class Task implements ITask{
     }
 
     @Override
-    public List<String> getUsedAppliances() {
-        List<String> appliances = new ArrayList<>();
+    public Collection<String> getUsedAppliances() {
+        Collection<String> appliances = new ArrayList<>();
         
         appliances.add(performedAt);
         
@@ -163,6 +196,12 @@ public class Task implements ITask{
 
     @Override
     public void completeTask(Person p, SimulationMap map) {
+        for(String state: pos){
+            p.addState("+"+state);
+        }
+        for(String state: neg){
+            p.addState("-"+state);
+        }
         if(fulfilledNeed != null){
              List<Need> needs = p.getNeeds();
              for(Need need: needs){
@@ -204,5 +243,26 @@ public class Task implements ITask{
     @Override
     public String name() {
         return taskName;
+    }
+
+    public void addPose(String poseString) {
+        poseSet.add(poseString);
+    }
+
+    @Override
+    public Set<String> getPoses() {
+        return poseSet;
+    }
+
+    public void addNeededState(String poseString) {
+        precond.add(poseString);
+    }
+
+    public void addPlusState(String substring) {
+        pos.add(substring);
+    }
+
+    public void addMinusState(String substring) {
+        neg.add(substring);
     }
 }

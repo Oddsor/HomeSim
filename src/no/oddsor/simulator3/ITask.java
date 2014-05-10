@@ -22,7 +22,7 @@ public interface ITask {
     
     public boolean itemsExist(Person p, SimulationMap map);
     
-    public boolean personHasAllItems(Person person);
+    public boolean personMeetsRequirements(Person person);
     
     public Collection<Appliance> getViableAppliances(Collection<Appliance> allAppliances);
     
@@ -34,11 +34,17 @@ public interface ITask {
     
     public Set<String> getRequiredItemsSet();
     
-    public List<String> getUsedAppliances();
+    public Collection<String> getUsedAppliances();
     
     public void completeTask(Person p, SimulationMap map);
     
     public void consumeItem(Person p);
     
     public String name();
+
+    public Set<String> getPoses();
+    
+    public Set<String> getNeg();
+    public Set<String> getPos();
+    public Set<String> getPrecond();
 }

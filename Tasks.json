@@ -26,7 +26,7 @@
 		{
 			"Name": "Watch TV",
 			"Type": "Infinite",
-			"Duration": 60,
+			"Duration": 15,
 			"Appliance": "Sofa",
 			"IncreasesNeed": ["Fun", 5]
 		},
@@ -35,16 +35,57 @@
 			"Type": "Scheduled",
 			"Duration": 240,
 			"Appliance": "Outside",
+			"NeedsState": ["Shoes", "Jacket"],
 			"Timespan": [8, 10]
-		},
-		{
+		},{
+			"Name": "Equip shoes",
+			"Type": "Finite",
+			"Duration": 1,
+			"Appliance": "Shoerack",
+			"AddsState": ["+Shoes"]
+		},{
+			"Name": "Equip jacket",
+			"Type": "Finite",
+			"Duration": 1,
+			"Appliance": "Jacketrack",
+			"AddsState": ["+Jacket"]
+		},{
+			"Name": "Remove jacket",
+			"Type": "Finite",
+			"Duration": 1,
+			"Appliance": "Jacketrack",
+			"NeedsState": ["Jacket"],
+			"AddsState": ["-Jacket"]
+		},{
+			"Name": "Remove shoes",
+			"Type": "Finite",
+			"Duration": 1,
+			"Appliance": "Shoerack",
+			"NeedsState": ["Shoes"],
+			"AddsState": ["-Shoes"]
+		},{
+			"Name": "Equip clothes",
+			"Type": "Finite",
+			"Duration": 1,
+			"Appliance": "Closet",
+			"NeedsState": ["Undressed"],
+			"AddsState": ["-Undressed"]
+		},{
+			"Name": "Remove clothes",
+			"Type": "Finite",
+			"Duration": 1,
+			"Appliance": "ClothesBin",
+			"Creates": "Laundry",
+			"AddsState": ["+Undressed"]
+		},{
 			"Name": "Make dinner",
 			"Type": "Finite",
 			"Timespan": [16,20],
 			"Appliance": "Oven",
 			"Duration": 5,
 			"RequiresItem": "Ingredients",
-			"Creates": "Food"
+			"Creates": "Food",
+			"PoseFeatures": ["+Chopping"]
 		},
 		{
 			"Name": "Make food",
@@ -53,7 +94,8 @@
 			"RequiresItem": "Ingredients",
 			"Duration": 2,
 			"Timespan": [20,16],
-			"Creates": "Food"
+			"Creates": "Food",
+			"PoseFeatures": ["+SlicingBread"]
 		},
 		{ 
 			"Name": "Eat food",
@@ -62,7 +104,8 @@
 			"Duration": 10,
 			"RequiresItem": ["Food", "Utensils", "Plate"],
 			"Creates": "DirtyDishes",
-			"IncreasesNeed": ["Hunger", 100]
+			"IncreasesNeed": ["Hunger", 100],
+			"PoseFeatures": ["+Eating", "ArmsToFace"]
 		},
 		{
 			"Name": "Start dishwasher",
@@ -77,8 +120,8 @@
 			"Duration": 5,
 			"Appliance": "Shower",
 			"IncreasesNeed": ["Hygiene", 100],
-			"Creates": "Laundry",
-			"SetsPersonal": "-Dressed"
+			"NeedsState": ["Undressed"],
+			"AddsState": ["-Unshowered"]
 		},
 		{ 
 			"Name": "Go to the toilet",
@@ -93,8 +136,8 @@
 			"Duration": 10,
 			"Appliance": "Sofa",
 			"IncreasesNeed": ["Fun", 5],
-			"Timespan": [9, 23],
-			"RequiresItem": "Book"
+			"RequiresItem": "Book",
+			"PoseFeatures": ["+FlippingPages", "ArmNinety"]
 		},
 		{
 			"Name": "Find book",
@@ -109,6 +152,7 @@
 			"Duration": 45,
 			"Timespan": [9, 23],
 			"Appliance": "Outside",
+			"NeedsState": ["Shoes", "Jacket"]
 			"Creates": "Wares"
 		},
 		{
@@ -125,15 +169,24 @@
 			"Duration": 30,
 			"Appliance": "Bed",
 			"Timespan": [23,7],
-			"IncreasesNeed": ["Energy", 5]
+			"IncreasesNeed": ["Energy", 5],
+			"NeedsState": ["Undressed", "Brushed"],
+			"AddsState": ["+Unshowered", "-Brushed"]
+		},{
+			"Name": "Brush teeth",
+			"Type": "Finite",
+			"Duration": 2,
+			"Appliance": "BathSink",
+			"AddsState": ["+Brushed"],
+			"PoseFeatures": ["+BrushingTeeth", "ArmsToFace"]
 		},
 		{
 			"Name": "Use PC",
 			"Type": "Infinite",
-			"Duration": -1,
+			"Duration": 5,
 			"Appliance": "PC",
-			"Timespan": [9, 23],
-			"IncreasesNeed": ["Fun", 5]
+			"IncreasesNeed": ["Fun", 5],
+			"PoseFeatures": ["+UseKeyboardMouse", "ArmsNinety"]
 		},
 		{
 			"Name": "Find plate",

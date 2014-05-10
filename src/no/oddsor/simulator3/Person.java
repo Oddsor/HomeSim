@@ -12,10 +12,7 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import no.oddsor.simulator3.tables.Node;
 
-/**
- *
- * @author Odd
- */
+
 public class Person{
 
     private Point currentLocation;
@@ -28,7 +25,13 @@ public class Person{
     
     public String targetItem;
     
+    Set<String> state;
+    
     private final HashMap<String, Integer> inventory;
+
+    public HashMap<String, Integer> getInventory() {
+        return inventory;
+    }
     public Image avatarImg;
     private ITask goalTask;
     private Appliance usingAppliance;
@@ -44,6 +47,7 @@ public class Person{
         if(needs != null) this.needs = new ArrayList<>(needs);
         else this.needs = null;
         inventory = new HashMap<>();
+        state = new HashSet<>();
     }
     
     public void addNeed(Need need){
@@ -79,7 +83,7 @@ public class Person{
         }
     }
     
-    public void setAppliance(Appliance app){
+    private void setAppliance(Appliance app){
         this.usingAppliance = app;
     }
     
@@ -87,10 +91,15 @@ public class Person{
         return needs;
     }
     
-    public void setCurrentTask(ITask task){
+    private void setCurrentTask(ITask task){
         System.out.println("Task set");
         this.currentTask = task;
         if(task != null) this.remainingTaskDuration = task.getDurationSeconds();
+    }
+    
+    public void setCurrentTask(ITask task, Appliance appliance){
+        this.setCurrentTask(task);
+        this.setAppliance(appliance);
     }
     
     public double remainingDuration(){
@@ -148,8 +157,21 @@ public class Person{
     
     public Set<String> getPoseData(){
         Set<String> poses = new HashSet<>();
-        //poses.addAll(currentTask.getPoses());
+        if(currentTask != null) poses.addAll(currentTask.getPoses());
         //poses.addAll(usingAppliance.getPoses());
         return poses;
+    }
+
+    boolean isMoving() {
+        return (this.currentTask != null || this.targetItem != null) && (route != null && route.size() > 0);
+    }
+    
+    void addState(String stateString){
+        if(stateString.charAt(0) == '+') state.add(stateString.substring(1));
+        else state.remove(stateString.substring(1));
+    }
+    
+    public Set<String> getState(){
+        return state;
     }
 }

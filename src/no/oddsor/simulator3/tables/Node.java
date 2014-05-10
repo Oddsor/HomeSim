@@ -63,7 +63,7 @@ public class Node extends AbstractTable implements AStarNode{
             }
             db.exec("DELETE FROM node_objects WHERE nodeid = " + id);
             for(Appliance type: types){
-                db.exec("INSERT INTO node_objects VALUES(null, " + id + ", '" + type.type() + "');");
+                db.exec("INSERT INTO node_objects VALUES(null, " + id + ", '" + type.type() + "', '');");
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -105,7 +105,7 @@ public class Node extends AbstractTable implements AStarNode{
             db.exec("CREATE TABLE IF NOT EXISTS node (" +
 "room INT, id INTEGER PRIMARY KEY, x INT, y INT);");
             db.exec("CREATE TABLE IF NOT EXISTS node_objects (id INTEGER PRIMARY KEY, " + 
-                    "nodeid INTEGER, type VARCHAR(45));");
+                    "nodeid INTEGER, type VARCHAR(45), poses VARCHAR(200));");
         }catch(Exception e){
             e.printStackTrace();
         }

@@ -115,7 +115,7 @@ public class SimulationMap {
         return itemNodes;
     }
     
-    public Collection<Node> getLocationAppliances(List<String> appliance){
+    public Collection<Node> getLocationAppliances(Collection<String> appliance){
         Collection<Node> locations = new ArrayList<>();
         for(Appliance app: objects){
             for(String appType: appliance){

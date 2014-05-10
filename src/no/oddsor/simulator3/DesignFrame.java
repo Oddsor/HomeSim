@@ -1,7 +1,6 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.tables.Node;
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -20,6 +19,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import no.oddsor.simulator3.json.JSON;
+import no.oddsor.simulator3.tables.Node;
 
 /**
  *
