@@ -28,9 +28,16 @@
 			"Type": "Infinite",
 			"Duration": 15,
 			"Appliance": "Sofa",
+			"PoseFeatures": ["Sitting"],
 			"IncreasesNeed": ["Fun", 5]
-		},
-		{
+		},{
+			"Name": "Nap on sofa",
+			"Type": "Finite",
+			"Duration": 20,
+			"Appliance": "Sofa",
+			"PoseFeatures": ["Laying"],
+			"IncreasesNeed": ["Energy, 5]
+		},{
 			"Name": "Go to work",
 			"Type": "Scheduled",
 			"Duration": 240,

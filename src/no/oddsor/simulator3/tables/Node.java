@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import net.oddsor.AStarMulti.AStarNode;
 import no.oddsor.simulator3.Appliance;
-import no.oddsor.simulator3.Room;
+import no.oddsor.simulator3.deprecated.Room;
 
 /**
  *
