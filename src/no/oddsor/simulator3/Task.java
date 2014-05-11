@@ -27,13 +27,17 @@ public class Task implements ITask{
     double remainingSeconds;
     String performedAt;
     String type;
+    String label;
     private final Set<String> poseSet;
     private final Set<String> precond;
     private final Set<String> pos;
     private final Set<String> neg;
+    private double cooldownMax;
+    private double cooldown;
 
-    public Task(String taskName, String type, int durationMinutes, String performedAt) {
+    public Task(String taskName, String type, int durationMinutes, String performedAt, String label) {
         this.taskName = taskName;
+        this.label = label;
         this.type = type;
         this.durationMinutes = durationMinutes;
         this.remainingSeconds = (double) (durationMinutes * 60);
@@ -48,6 +52,13 @@ public class Task implements ITask{
         this.precond = new HashSet<>();
         this.pos = new HashSet<>();
         this.neg = new HashSet<>();
+        this.cooldownMax = 0.0;
+        this.cooldown = 0.0;
+    }
+    
+    public Task(String taskName, String type, int durationMinutes, String performedAt, String label, int cooldown) {
+        this(taskName, type, durationMinutes, performedAt, label);
+        this.setCooldown(cooldown*60.0);
     }
 
     @Override
@@ -66,8 +77,8 @@ public class Task implements ITask{
     }
     
     public Task(String taskName, String type, int durationSeconds,
-            int startTime, int endTime, String performedAt) {
-        this(taskName, type, durationSeconds, performedAt);
+            int startTime, int endTime, String performedAt, String label) {
+        this(taskName, type, durationSeconds, performedAt, label);
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -103,14 +114,6 @@ public class Task implements ITask{
         return viableObjects;
     }
     
-    public boolean taskAvailable(int day, int hour){
-        if(startTime == 0 && endTime == 0) return true;
-        int newEnd = (endTime - startTime) % 24;
-        int newCurrent = (hour - startTime) % 24;
-        
-        return newCurrent <= newEnd;
-    }
-    
     public boolean completable(Person p, SimulationMap map){
         Iterator<String> it = requiredItem.keySet().iterator();
         while(it.hasNext()){
@@ -129,10 +132,10 @@ public class Task implements ITask{
 
     @Override
     public boolean available(double time) {
-        if(startTime < 0 || endTime < 0) return true;
+        if(startTime < 0 || endTime < 0 && cooldown == 0.0) return true;
         int newEndTime = (endTime + (24 - startTime)) % 24;
         int offset = (Time.getHours(time) + (24 - startTime)) % 24;
-        return offset < newEndTime;
+        return offset < newEndTime && cooldown == 0.0;
     }
 
     @Override
@@ -231,9 +234,9 @@ public class Task implements ITask{
     }
     
     public static void main(String[] args){
-        Task t2 = new Task("Hei", "jepp", 22, null);
+        Task t2 = new Task("Hei", "jepp", 22, null, "hei");
         System.out.println(t2.available(100));
-        Task t = new Task("Hei", "jepp", 22, 9, 23, null);
+        Task t = new Task("Hei", "jepp", 22, 9, 23, null, "hei");
         System.out.println(t.available(100));
         double tim = 80000;
         System.out.println(Time.getHours(tim));
@@ -264,5 +267,38 @@ public class Task implements ITask{
 
     public void addMinusState(String substring) {
         neg.add(substring);
+    }
+
+    @Override
+    public String label() {
+        return label;
+    }
+
+    @Override
+    public boolean itemExists(Person person, SimulationMap map) {
+        for(String item: requiredItem.keySet()){
+            if(map.hasItem(item, requiredItem.get(item)) && !person.hasItem(item, requiredItem.get(item))) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public void recentlyCompleted() {
+        this.cooldown = cooldownMax;
+    }
+
+    public void setCooldown(double d) {
+        this.cooldownMax = d;
+    }
+
+    @Override
+    public void passTime(double d) {
+        this.cooldown -= d;
+        if(cooldown < 0.0) cooldown = 0.0;
     }
 }

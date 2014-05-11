@@ -1,7 +1,6 @@
 
 package no.oddsor.simulator3;
 
-import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -21,12 +20,10 @@ import no.oddsor.simulator3.sensor.SensorArea;
 public class SimulationDisplay extends JPanel{
     
     private Image image;
-    private SQLiteConnection db;
     private Collection<Sensor> sensors;
     private Collection<Person> people;
 
-    public SimulationDisplay(String mapName, SQLiteConnection db) {
-        this.db = db;
+    public SimulationDisplay(String mapName) {
         image = new ImageIcon(getClass().getResource(mapName)).getImage();
         Dimension size = new Dimension(image.getWidth(this), image.getHeight(this));
         setPreferredSize(size);

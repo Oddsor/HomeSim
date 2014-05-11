@@ -15,8 +15,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 import javax.swing.JPanel;
@@ -112,15 +110,15 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
     @Override
     public void mouseMoved(MouseEvent arg0) {
         if(hoveredPoint != null){
-            if((arg0.getX() < hoveredPoint.getLocation().x - 4 || arg0.getX() > hoveredPoint.getLocation().x + 4) ||
-                        (arg0.getY() < hoveredPoint.getLocation().y - 4 || arg0.getY() > hoveredPoint.getLocation().y + 4)){
+            if(arg0.getX() < hoveredPoint.getLocation().x - 4 || arg0.getX() > hoveredPoint.getLocation().x + 4 ||
+                        arg0.getY() < hoveredPoint.getLocation().y - 4 || arg0.getY() > hoveredPoint.getLocation().y + 4){
                     hoveredPoint = null;
                     repaint();
                 }
         }else{
             for(Node point: points){
-                if((arg0.getX() > point.getLocation().x - 4 && arg0.getX() < point.getLocation().x + 4) &&
-                        (arg0.getY() > point.getLocation().y - 4 && arg0.getY() < point.getLocation().y + 4)){
+                if(arg0.getX() > point.getLocation().x - 4 && arg0.getX() < point.getLocation().x + 4 &&
+                        arg0.getY() > point.getLocation().y - 4 && arg0.getY() < point.getLocation().y + 4){
                     hoveredPoint = point;
                     repaint();
                 }
@@ -141,13 +139,11 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
 
     @Override
     public void mouseEntered(MouseEvent arg0) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mouseExited(MouseEvent arg0) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -162,7 +158,6 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
 
     @Override
     public void mouseReleased(MouseEvent arg0) {
-        // TODO Auto-generated method stub
         xReleased = arg0.getX();
         yReleased = arg0.getY();
         addKeyListener(this);
@@ -170,8 +165,8 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
         //if(draggingPoint == true) draggingPoint = false;
         if(selectedPoint != null && arg0.getButton() == MouseEvent.BUTTON1 && drawingLine){
             for(Node point: points){
-                if((arg0.getX() > point.getLocation().x - 4 && arg0.getX() < point.getLocation().x + 4) &&
-                            (arg0.getY() > point.getLocation().y - 4 && arg0.getY() < point.getLocation().y + 4)){
+                if(arg0.getX() > point.getLocation().x - 4 && arg0.getX() < point.getLocation().x + 4 &&
+                            arg0.getY() > point.getLocation().y - 4 && arg0.getY() < point.getLocation().y + 4){
                     Edge edg = new Edge(-1, point, selectedPoint);
                     if(!edg.exists(edges, point, selectedPoint)){
                         edg.update(db);
@@ -199,7 +194,7 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
         }
         else if(arg0.getButton() == MouseEvent.BUTTON3 && selectedPoint == null){
             try{
-                Node nod = new Node(db, -1, new Point(arg0.getX(), arg0.getY()), null);
+                Node nod = new Node(db, -1, new Point(arg0.getX(), arg0.getY()));
                 nod.update();
                 points.add(nod);
             }catch(Exception e){

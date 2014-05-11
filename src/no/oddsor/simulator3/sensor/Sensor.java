@@ -20,13 +20,13 @@ import java.util.List;
  */
 public interface Sensor {
     
-    public String getName();
+    String getName();
     
-    public List<SensorArea> getSensorAreas();
+    List<SensorArea> getSensorAreas();
     
-    public void removeArea(Area area);
+    void removeArea(Area area);
     
-    public void confineToArea(Area area);
+    void confineToArea(Area area);
     
-    public Point getPosition();
+    Point getPosition();
 }

@@ -11,47 +11,30 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Random;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import no.oddsor.simulator3.sensor.Camera;
+import no.oddsor.simulator3.sensor.Sensor;
+import no.oddsor.simulator3.sensor.SensorArea;
 
 
 public class SensorLogger {
+    private static final Logger LOG = Logger.getLogger(SensorLogger.class.getName());
 
-    public static void main(String[] args) {
-        System.out.println(10 / 30 + 1);
-        System.out.println(30 / 30 + 1);
-        System.out.println(50 / 30 + 1);
-        System.out.println(60 / 30 + 1);
-        SensorLogger sl;
-        try {
-            sl = new SensorLogger("yep.txt");
-            double time = 1546.5437;
-            Random rand = new Random();
-            for(int i = 0; i < 200; i++){
-                time += (rand.nextInt(30000));
-                sl.addSensor(time, "Kitchen sensor", 
-                "Motion sensor", "OFF", "eating food");
-            }
-            
-        } catch (IOException ex) {
-            Logger.getLogger(SensorLogger.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
-        }
-        
-    }
     private BufferedWriter fileWriter;
     private final DecimalFormat df;
     private int counter;
     private int suffix;
     private final String fileName;
+    private final Map<String, Double> lastTriggered;
+    
+    private final double TRIGGER_INTERVAL = 5.0;
     
     public SensorLogger(String fileName) throws IOException{
-        try{
-            //BufferedReader br = new BufferedReader(new FileReader(fileName));
-        }catch(Exception e){
-            e.printStackTrace();
-        }
         this.fileName = fileName;
         this.suffix = 1;
         this.fileWriter = new BufferedWriter(new FileWriter(fileName+suffix, true));
@@ -62,8 +45,85 @@ public class SensorLogger {
         df.setMaximumIntegerDigits(2);
         df.setMinimumFractionDigits(6);
         df.setMaximumFractionDigits(6);
-        System.out.println("How often does this happen?!");
         counter = 0;
+        lastTriggered = new HashMap<String, Double>();
+    }
+    
+    public void log(Person person, Collection<Sensor> sensors, double currentTime){
+        for(Sensor s: sensors){
+            for(SensorArea sa: s.getSensorAreas()){
+                if(sa.getArea() == null && person.getUsingAppliance() != null 
+                        && !person.isMoving() && person.getCurrentTask() != null
+                        && sa.getName().contains(person.getUsingAppliance().type) &&
+                        (!lastTriggered.containsKey(person.getUsingAppliance().getName()) || 
+                        (lastTriggered.get(person.getUsingAppliance().getName()) != null && currentTime - lastTriggered.get(person.getUsingAppliance().getName()) >= 60.0))){
+                    lastTriggered.put(person.getUsingAppliance().getName(), currentTime);
+                    
+                    try {
+                        addSensor(currentTime, person.getUsingAppliance().getName(),
+                                s.getClass().getSimpleName(), "ON", person.getCurrentTask().name());
+                        sa.setLastValue("ON");
+                    } catch (IOException ex) {
+                        LOG.log(Level.SEVERE, null, ex);
+                    }
+                    
+                }else if(sa.getArea() != null && sa.getArea().contains(person.currentLocation())){
+                    if(s instanceof Camera && !person.isMoving()){
+                        Set<String> poses = person.getPoseData();
+                        for(String pose:poses){
+                            if(!lastTriggered.containsKey(sa.getName() + pose) ||
+                                    (lastTriggered.get(sa.getName() + pose) != null && 
+                                    currentTime - lastTriggered.get(sa.getName() + pose)  >= 120.0)){
+                                lastTriggered.put(sa.getName() + pose, currentTime);
+                                try{
+                                    addSensor(currentTime, sa.getName(), s.getClass().getSimpleName(), pose, 
+                                            (person.getCurrentTask() != null ? 
+                                                    (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
+                                                            (person.getGoalTask().label() != null? person.getGoalTask().label():"Other_Activity"))
+                                                    : "Other_Activity"));
+                                }catch(IOException ex){
+                                    LOG.log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        }
+                    }
+                    if(!lastTriggered.containsKey(sa.getName()) || 
+                            (lastTriggered.get(sa.getName()) != null && currentTime - lastTriggered.get(sa.getName())  >= TRIGGER_INTERVAL)){
+                        lastTriggered.put(sa.getName(), currentTime);
+                        if(!sa.getLastValue().equals("ON")){
+                            try {
+                                addSensor(currentTime, sa.getName(),
+                                        s.getClass().getSimpleName(), "ON",
+                                        (person.getCurrentTask() != null ? 
+                                                        (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
+                                                                (person.getGoalTask() != null && person.getGoalTask().label() != null? person.getGoalTask().label():"Other_Activity"))
+                                                        : "Other_Activity"));
+                                sa.setLastValue("ON");
+                            } catch (IOException ex) {
+                                LOG.log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }else{
+                    //Not still in area.
+                    if(lastTriggered.containsKey(sa.getName()) && currentTime - lastTriggered.get(sa.getName()) >= TRIGGER_INTERVAL){
+                        if(!sa.getLastValue().equals("OFF")){
+                            try {
+                                addSensor(currentTime, sa.getName(),
+                                        s.getClass().getSimpleName(), "OFF",
+                                        (person.getCurrentTask() != null ? 
+                                                        (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
+                                                                (person.getGoalTask() != null && person.getGoalTask().label() != null? person.getGoalTask().label():"Other_Activity"))
+                                                        : "Other_Activity"));
+                                sa.setLastValue("OFF");
+                            } catch (IOException ex) {
+                                LOG.log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     public void addSensor(double time, String sensorName, String sensorNote, 

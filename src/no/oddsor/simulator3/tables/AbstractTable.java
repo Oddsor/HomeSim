@@ -3,8 +3,6 @@ package no.oddsor.simulator3.tables;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  *
@@ -12,39 +10,17 @@ import java.util.Map;
  */
 abstract class AbstractTable{
     
-    private static final String INTEGER = "INTEGER";
-    private static final String DOUBLE = "DOUBLE";
-    private static final String STRING = "STRING";
     
     SQLiteConnection db;
     public int id;
     
     private String tableName;
-    private Map<String, String> columns;
     
-    public AbstractTable(SQLiteConnection db, int id, String tableName, 
-            Map<String, String> columns) throws SQLiteException{
+    public AbstractTable(SQLiteConnection db, int id, String tableName) throws SQLiteException{
         if(!db.isOpen()) db.open();
         this.db = db;
         this.id = id;
         this.tableName = tableName;
-        this.columns = columns;
-    }
-    
-    private static void createSimpleTable(String tableName, Map<String, String> columns, 
-            boolean ifNotExists, SQLiteConnection dbConn) throws SQLiteException {
-        String sql = "CREATE TABLE " + (ifNotExists ? "IF NOT EXISTS ": "") + tableName + "(";
-        sql += ("id INTEGER PRIMARY KEY, ");
-        Iterator it = columns.keySet().iterator();
-        while(it.hasNext()){
-            String colName = (String) it.next();
-            if(columns.get(colName).equals(STRING)) sql += (colName + " '" + columns.get(colName) + "'");
-            else sql += (colName + " " + columns.get(colName));
-            if(it.hasNext()) sql += ", ";
-            else sql += ");";
-        }
-        dbConn.open();
-        dbConn.exec(sql);
     }
     
     public boolean remove(){

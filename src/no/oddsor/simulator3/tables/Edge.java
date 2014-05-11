@@ -26,9 +26,8 @@ public class Edge {
             }
         }catch(Exception e){
             e.printStackTrace();
-        }finally{
-            return edges;
         }
+        return edges;
     }
 
     public static void createTable(SQLiteConnection db){
@@ -96,7 +95,6 @@ public class Edge {
             }
         }catch(Exception e){
             e.printStackTrace();
-        }finally{
         }
     }
 }

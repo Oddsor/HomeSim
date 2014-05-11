@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import no.oddsor.simulator3.json.SensorReader;
+import no.oddsor.simulator3.sensor.Sensor;
 
-/**
- * An implementation of a map. Players move on an screencap of an apartment's
- * layout via a node network.
- * @author Odd
- */
+
 public class SimulationMap {
     /**
     * Can move approx 50 pixels in appsketch.jpg-image.
@@ -28,11 +28,21 @@ public class SimulationMap {
     private final Collection<Person> people;
     public ArrayList<Appliance> objects;
     public Collection<Item> items;
+    private Collection<Sensor> sensors;
+
+    public Collection<Sensor> getSensors() {
+        return sensors;
+    }
     
     public SimulationMap(String mapName, int walkingDistancePerSec, int startId, 
             Collection<Person> people, int dotsPerMeter, SQLiteConnection db){
         this.mapName = mapName;
         this.people = people;
+        try {
+            sensors = new SensorReader("sensors.json").getSensors();
+        } catch (Exception ex) {
+            Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.walkingSpeedPerSec = walkingDistancePerSec;
         this.dotsPerMeter = dotsPerMeter;
         this.startNodeId = startId;
@@ -142,7 +152,7 @@ public class SimulationMap {
     public static void main(String[] args){
         SimulationMap map = new  SimulationMap("", 5, 1, null, 43, null);
         map.addItem(new Item("Wares", null));
-        Task t = new Task("ye", "s", 1, null);
+        Task t = new Task("ye", "s", 1, null, "ye");
         t.addRequiredItem("Wares", 1);
         System.out.println(t.itemsExist(new Person("s", "oddsurcut.png", null, null), map));
         System.out.println(map.hasItem("Wares", 1));

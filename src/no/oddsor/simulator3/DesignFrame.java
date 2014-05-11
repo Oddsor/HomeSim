@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import no.oddsor.simulator3.json.JSON;
+import no.oddsor.simulator3.json.TaskReader;
 import no.oddsor.simulator3.tables.Node;
 
 /**
@@ -26,12 +26,9 @@ import no.oddsor.simulator3.tables.Node;
  * @author Odd
  */
 public class DesignFrame extends JFrame implements ActionListener{
-    private DatabaseHandler dbHandler;
-    private SQLiteConnection db;
     private NodePainter painter;
     private JLabel mouseLocation;
     private JPanel nodePanel;
-    private MainFrame mainFrame;
     
     private JCheckBox isStart;
     private Node selectedNode;
@@ -39,9 +36,7 @@ public class DesignFrame extends JFrame implements ActionListener{
     private JComboBox chooser;
     private JList lister;
     
-    public DesignFrame(MainFrame frame, SQLiteConnection db){
-        this.mainFrame = frame;
-        this.db = db;
+    public DesignFrame(SQLiteConnection db){
         setTitle("Editor");
         try{
             painter = new NodePainter(this, "appsketch.jpg", db);
@@ -80,7 +75,7 @@ public class DesignFrame extends JFrame implements ActionListener{
         }
         selectedNode = selectedPoint;
         pan.add(isStart);
-        JSON json = new JSON("Tasks.json");
+        TaskReader json = new TaskReader("Tasks.json");
         Set<String> objectList = json.getAppliances();
         chooser = new JComboBox(objectList.toArray());
         pan.add(chooser);
@@ -90,7 +85,7 @@ public class DesignFrame extends JFrame implements ActionListener{
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                selectedNode.addObject((chooser.getSelectedItem().toString()));
+                selectedNode.addObject(chooser.getSelectedItem().toString());
                 try {
                     setActiveNode(selectedNode);
                 } catch (Exception ex) {

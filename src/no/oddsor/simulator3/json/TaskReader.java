@@ -24,13 +24,13 @@ import org.json.simple.parser.JSONParser;
  *
  * @author Odd
  */
-public class JSON {
+public class TaskReader {
     
     public final JSONObject object;
     
-    public JSON(String filename) throws Exception{
+    public TaskReader(String filename) throws Exception{
         JSONParser jp = new JSONParser();
-        this.object = (JSONObject)jp.parse(new FileReader("tasks.json"));
+        this.object = (JSONObject)jp.parse(new FileReader(filename));
     }
     
     public Collection<ITask> getTasks(){
@@ -46,11 +46,17 @@ public class JSON {
                         (String) nextTask.get("Type"), 
                         Integer.parseInt(nextTask.get("Duration").toString()),
                         Integer.parseInt(timespan.get(0).toString()), 
-                        Integer.parseInt(timespan.get(1).toString()), (String) nextTask.get("Appliance")));
+                        Integer.parseInt(timespan.get(1).toString()), (String) nextTask.get("Appliance"),
+                        (nextTask.containsKey("Label")? (String) nextTask.get("Label"): null)));
             }else{
                 tasks.add(newTask = new Task((String) nextTask.get("Name"), 
                         (String) nextTask.get("Type"), 
-                        Integer.parseInt(nextTask.get("Duration").toString()), (String) nextTask.get("Appliance")));
+                        Integer.parseInt(nextTask.get("Duration").toString()), (String) nextTask.get("Appliance"),
+                        (nextTask.containsKey("Label")? (String) nextTask.get("Label"): null)));
+            }
+            if(nextTask.containsKey("Cooldown")){
+                double d = (long)nextTask.get("Cooldown") * 60.0;
+                newTask.setCooldown(d);
             }
             if(nextTask.containsKey("IncreasesNeed")){
                 JSONArray need = (JSONArray) nextTask.get("IncreasesNeed");
@@ -153,7 +159,7 @@ public class JSON {
     
     public static void main(String[] args){
         try {
-            JSON j = new JSON("tasks.json");
+            TaskReader j = new TaskReader("tasks.json");
             System.out.println(j.object.toJSONString());
             System.out.println(j.getAppliances().toString());
             System.out.println(j.getPeople().iterator().next().name);

@@ -33,7 +33,7 @@ public class SensorReader {
     
     public SensorReader(String fileName) throws Exception{
         JSONParser jp = new JSONParser();
-        this.object = (JSONObject) jp.parse(new FileReader("sensors.json"));
+        this.object = (JSONObject) jp.parse(new FileReader(fileName));
     }
     
     public Collection<Sensor> getSensors(){

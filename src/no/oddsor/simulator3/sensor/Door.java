@@ -32,7 +32,6 @@ import java.util.List;
 public class Door implements Sensor{
     private String name;
     private Point location;
-    private Dimension dimensions;
     private Area area;
     private final SensorArea sa;
 

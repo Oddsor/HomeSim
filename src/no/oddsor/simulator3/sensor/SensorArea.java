@@ -16,6 +16,7 @@ public class SensorArea{
 
     private String name;
     private Area area;
+    private String lastValue;
 
     public String getName() {
         return name;
@@ -24,9 +25,18 @@ public class SensorArea{
     public SensorArea(String name, Area area) {
         this.area = area;
         this.name = name;
+        this.lastValue = "";
     }
     
     public Area getArea(){
         return area;
+    }
+    
+    public void setLastValue(String val){
+        lastValue = val;
+    }
+    
+    public String getLastValue(){
+        return lastValue;
     }
 }

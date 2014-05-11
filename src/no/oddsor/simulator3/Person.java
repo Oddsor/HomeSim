@@ -64,9 +64,7 @@ public class Person{
     }
     
     public boolean hasItem(String item, int amount){
-        if(inventory.containsKey(item)){
-            if(inventory.get(item) >= amount) return true;
-        }
+        if(inventory.containsKey(item) && inventory.get(item) >= amount) return true;
         return false;
     }
 
@@ -92,7 +90,6 @@ public class Person{
     }
     
     private void setCurrentTask(ITask task){
-        System.out.println("Task set");
         this.currentTask = task;
         if(task != null) this.remainingTaskDuration = task.getDurationSeconds();
     }
@@ -114,7 +111,6 @@ public class Person{
         return goalTask;
     }
     public void setGoalTask(ITask task){
-        System.out.println("Goal set");
         this.goalTask = task;
     }
     
@@ -127,7 +123,6 @@ public class Person{
     }
     
     public void setTargetItem(String itemName){
-        System.out.println("Item set");
         this.targetItem = itemName;
         fetchTime = 2.0;
     }
@@ -158,8 +153,12 @@ public class Person{
     public Set<String> getPoseData(){
         Set<String> poses = new HashSet<>();
         if(currentTask != null) poses.addAll(currentTask.getPoses());
-        //poses.addAll(usingAppliance.getPoses());
-        return poses;
+        if(usingAppliance != null) poses.addAll(usingAppliance.getPoses());
+        Set<String> filtered = new HashSet<>();
+        for(String pose: poses){
+            if(!pose.trim().isEmpty()) filtered.add(pose);
+        }
+        return filtered;
     }
 
     boolean isMoving() {

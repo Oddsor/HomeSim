@@ -3,7 +3,6 @@ package no.oddsor.simulator3;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.GridLayout;
-import java.awt.LayoutManager2;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,9 +25,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
-import no.oddsor.simulator3.json.JSON;
-import no.oddsor.simulator3.json.SensorReader;
-import no.oddsor.simulator3.sensor.Sensor;
+import no.oddsor.simulator3.json.TaskReader;
 import sun.awt.VerticalBagLayout;
 
 /**
@@ -39,17 +36,18 @@ public class MainFrame extends JFrame{
     private SimulationDisplay painter;
     private DatabaseHandler dbHandler;
     private SQLiteConnection db;
-    private LayoutManager2 layout;
     private JPanel allNeeds;
     private JLabel timeLabel;
     Timer tim;
     Simulator sim;
+    SimulationMap map;
     
     private HashMap<String, JProgressBar> needBars;
     
     private DesignFrame designer;
     
     public HashMap<Integer, Object> options;
+    private final JLabel stateList;
     
     public MainFrame(){
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -70,14 +68,13 @@ public class MainFrame extends JFrame{
             db = dbHandler.getDb();
             db.open();
             ArrayList<Person> people = new ArrayList<>();
-            JSON j = new JSON("Tasks.json");
+            TaskReader j = new TaskReader("Tasks.json");
             people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0), j.getNeeds()));
             //people.add(new Person("Obama", "obama-head.png", new Point(0, 0), j.getNeeds()));
-            SimulationMap map = new SimulationMap("appsketch.jpg", 50, 1, people, 43, db);
+            map = new SimulationMap("appsketch.jpg", 50, 1, people, 43, db);
             sim = new Simulator(map, 3);
-            Collection<Sensor> sensors = new SensorReader("sensors.json").getSensors();
-            painter = new SimulationDisplay("appsketch.jpg", db);
-            designer = new DesignFrame(this, db);
+            painter = new SimulationDisplay("appsketch.jpg");
+            designer = new DesignFrame(db);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -86,7 +83,7 @@ public class MainFrame extends JFrame{
         Box menubox = Box.createVerticalBox();
         
         allNeeds = new JPanel(new VerticalBagLayout());
-        Collection<Person> allPeople = sim.getPeople();
+        Collection<Person> allPeople = map.getPeople();
         for(Person person: allPeople){
             List<Need> personNeeds = person.getNeeds();
             JPanel needsPanel = new JPanel(new GridLayout(person.getNeeds().size() + 1, 2));
@@ -124,7 +121,7 @@ public class MainFrame extends JFrame{
         });
         bottomButtonBox.add(editButton);
         box.add(painter);
-        painter.update(sim.getPeople(), sim.getSensors());
+        painter.update(map.getPeople(), map.getSensors());
         box.add(menubox);
         add(box);
         final JTextField filenameField = new JTextField("sensorvals", 10);
@@ -137,9 +134,9 @@ public class MainFrame extends JFrame{
                 if(!sim.simulationStep()) tim.setDelay(fastSpeed);
                 else{
                     tim.setDelay(slowSpeed);
-                    painter.update(sim.getPeople(), sim.getSensors());
+                    painter.update(map.getPeople(), map.getSensors());
+                    updateMenu();
                 }
-                updateMenu();
             }
         };
         tim = new Timer(10, timeListen);
@@ -157,21 +154,25 @@ public class MainFrame extends JFrame{
                 tim.start();
             }
         });
+        stateList = new JLabel("States: ");
+        menubox.add(stateList);
         menubox.add(filenameField);
         menubox.add(startStop);
         pack();
     }
     
     public void updateMenu(){
-        Collection<Person> people = sim.getPeople();
+        Collection<Person> people = map.getPeople();
+        String info = "";
         for(Person person: people){
             List<Need> needs = person.getNeeds();
             for(Need need: needs){
                 JProgressBar p = needBars.get(person.name+","+need.name());
                 p.setValue((int) need.getValue());
                 p.setString("" + (int) need.getValue());
-            }
+            }info += person.name + person.getState() + "\n";
         }
+        stateList.setText(info);
         timeLabel.setText("W: " + sim.time.getWeek(sim.currentTime) + 
                 ", D: " + sim.time.getDayName(sim.currentTime) + 
                 ", " + sim.time.getNumberFormatted(sim.time.getHours(sim.currentTime)) + 

@@ -6,10 +6,12 @@ import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import net.oddsor.AStarMulti.AStarNode;
 import no.oddsor.simulator3.Appliance;
-import no.oddsor.simulator3.deprecated.Room;
 
 /**
  *
@@ -22,10 +24,9 @@ public class Node extends AbstractTable implements AStarNode{
     private Point location;
     private final Collection<Node> neighbours;
     public ArrayList<Appliance> types;
-    private Room room;
 
-    public Node(SQLiteConnection db, int id, Point location, Room room) throws SQLiteException {
-        super(db, id, tableName, null);
+    public Node(SQLiteConnection db, int id, Point location) throws SQLiteException {
+        super(db, id, tableName);
         this.location = location;
         this.neighbours = new ArrayList<>();
         this.types = new ArrayList<>();
@@ -76,12 +77,16 @@ public class Node extends AbstractTable implements AStarNode{
             SQLiteStatement st = db.prepare("SELECT * FROM node");
             while (st.step()){
                 Node nod = new Node(db, st.columnInt(1), 
-                        new Point(st.columnInt(2), st.columnInt(3)), 
-                        Room.getRoom(st.columnInt(0), db));
+                        new Point(st.columnInt(2), st.columnInt(3)));
                 ArrayList<Appliance> types = new ArrayList<>();
                 SQLiteStatement st2 = db.prepare("SELECT * FROM node_objects WHERE nodeid = " + st.columnInt(1) + ";");
                 while(st2.step()){
-                    types.add(new Appliance(st2.columnString(2), nod));
+                    String poses = st2.columnString(3);
+                    if(poses != null){
+                        String[] poseVals = poses.split(" ");
+                        Set<String> poseSet = new HashSet<>(Arrays.asList(poseVals));
+                        types.add(new Appliance(st2.columnString(2), nod, poseSet));
+                    }else types.add(new Appliance(st2.columnString(2), nod));
                 }
                 nod.types = types;
                 nodes.add(nod);
@@ -95,9 +100,7 @@ public class Node extends AbstractTable implements AStarNode{
             }
         }catch(Exception e){
             e.printStackTrace();
-        }finally{
-            return nodes;
-        }
+        }return nodes;
     }
     
     public static void createTable(SQLiteConnection db){

@@ -1,24 +1,29 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.tables.Node;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import no.oddsor.simulator3.tables.Node;
 
-/**
- *
- * @author Odd
- */
+
 public class Appliance{
     
     Map<String, Integer> inventory;
     public String type;
     Node location;
+    private Set<String> poses;
     
     public Appliance(String itemType, Node location){
         this.type = itemType;
         this.location = location;
         inventory = new HashMap<>();
+        this.poses = new HashSet<>();
+    }
+    public Appliance(String itemType, Node location, Set<String> poses){
+        this(itemType, location);
+        this.poses = poses;
     }
 
     public Node getLocation(){
@@ -49,5 +54,9 @@ public class Appliance{
     }
     public String getName(){
         return type+getLocation().id;
+    }
+
+    Set<String> getPoses() {
+        return poses;
     }
 }

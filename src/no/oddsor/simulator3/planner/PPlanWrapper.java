@@ -65,7 +65,6 @@ public class PPlanWrapper {
             reqFacts.add(fact);
         }
         reqFacts.addAll(goalTask.getPrecond());
-        //TODO add personal state reqs.
         return reqFacts;
     }
     

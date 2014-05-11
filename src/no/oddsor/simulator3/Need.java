@@ -13,13 +13,12 @@ public class Need implements Comparable<Need>{
     
     public Need(String type, double deteriorationRate){
         this.type = type;
-        //TODO add deteriorationrate
         this.deteriorationRate = deteriorationRate;
         this.value = 100;
     }
     
     public void deteriorate(double seconds){
-        value -= (deteriorationRate / (60*60*seconds));
+        value -= deteriorationRate / (60*60*seconds);
         if(value < 0) value = 0;
     }
     
