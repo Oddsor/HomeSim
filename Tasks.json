@@ -160,8 +160,13 @@
 			"Type": "Finite",
 			"Appliance": "Refridgerator",
 			"Duration": 1
-			"RequiresItem": "Wares",
-			"Creates": ["Ingredients", 15]
+			"RequiresItem": "Wares"
+		},{
+			"Name": "Get from fridge",
+			"Type": "Finite",
+			"Appliance": "Refridgerator",
+			"Duration": 1,
+			"Creates": "Ingredients"
 		},
 		{
 			"Name": "Sleep",

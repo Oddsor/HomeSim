@@ -156,7 +156,6 @@ public class TaskManager {
                     if(app.type().contains(valid)) validApps.add(app);
                 }
             }
-            System.out.println("Validapps: " + validApps.size() + ", Valids: " + valids.size());
             Collection<Node> goals = map.getLocationAppliances(valids);
             for(Person p: map.getPeople()){
                 if(!p.equals(person) && p.getRoute() != null) goals.remove(p.getRoute().getLast());
