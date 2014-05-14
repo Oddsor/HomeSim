@@ -13,6 +13,7 @@ package no.oddsor.simulator3.sensor;
 import java.awt.Point;
 import java.awt.geom.Area;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -69,9 +70,11 @@ public class Camera implements Sensor{
 
     @Override
     public void removeArea(Area area) {
-        for(SensorArea sa: areas){
+        Iterator<SensorArea> it = areas.iterator();
+        while (it.hasNext()){
+            SensorArea sa = it.next();
             sa.getArea().subtract(area);
-            if(sa.getArea().isEmpty()) areas.remove(sa);
+            if(sa.getArea().isEmpty()) it.remove();
         }
     }
 
@@ -82,9 +85,11 @@ public class Camera implements Sensor{
 
     @Override
     public void confineToArea(Area area) {
-        for(SensorArea sa: areas){
+        Iterator<SensorArea> it = areas.iterator();
+        while (it.hasNext()){
+            SensorArea sa = it.next();
             sa.getArea().intersect(area);
-            if(sa.getArea().isEmpty()) areas.remove(sa);
+            if(sa.getArea().isEmpty()) it.remove();
         }
     }
 }

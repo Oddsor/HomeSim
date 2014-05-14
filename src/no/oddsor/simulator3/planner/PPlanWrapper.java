@@ -102,4 +102,12 @@ public class PPlanWrapper {
         plan.addOperator(t.name(), precond, neg, pos);
         //System.out.println(t.name() + ", P" + precond.toString() + ", -" + neg.toString() + ", +" + pos.toString());
     }
+    
+    public static void main(String[] args){
+        String t = "2014-01-01 00:00:16.333333 KitchenCamera13 KitchenCamera13 ON Eat_food";
+        String q = "2014-01-01 00:00:16.666667 KitchenCamera13 KitchenCamera13 +Leaning Eat_food";
+        
+        System.out.println(!t.contains("ON") && !t.contains("OFF"));
+        System.out.println(!q.contains("ON") && !q.contains("OFF"));
+    }
 }

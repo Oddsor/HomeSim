@@ -8,12 +8,15 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import no.oddsor.simulator3.tables.Node;
 
 
 public class Person{
+    
+    public static final int WANDERER = 1;
 
     private Point currentLocation;
     private Deque<Node> route;
@@ -28,6 +31,7 @@ public class Person{
     Set<String> state;
     
     private final HashMap<String, Integer> inventory;
+    private int personType;
 
     public HashMap<String, Integer> getInventory() {
         return inventory;
@@ -48,6 +52,11 @@ public class Person{
         else this.needs = null;
         inventory = new HashMap<>();
         state = new HashSet<>();
+        personType = 0;
+    }
+    public Person(String name, String avatarImage, Point currentLocation, List<Need> needs, int type){
+        this(name, avatarImage, currentLocation, needs);
+        personType = type;
     }
     
     public void addNeed(Need need){
@@ -91,7 +100,11 @@ public class Person{
     
     private void setCurrentTask(ITask task){
         this.currentTask = task;
-        if(task != null) this.remainingTaskDuration = task.getDurationSeconds();
+        Random rand = new Random();
+        if(task != null){
+            if(task.getType().equals("Automatic")) this.remainingTaskDuration = 60.0 * rand.nextInt(3);
+            else this.remainingTaskDuration = task.getDurationSeconds() + (60 * rand.nextInt(4));
+        }
     }
     
     public void setCurrentTask(ITask task, Appliance appliance){
@@ -146,8 +159,7 @@ public class Person{
     }
     
     public void removeItem(String itemName, int amount){
-        inventory.put(itemName, inventory.get(itemName) - amount);
-        if(inventory.get(itemName) <= 0) inventory.remove(itemName);
+        inventory.remove(itemName);
     }
     
     public Set<String> getPoseData(){
@@ -162,7 +174,7 @@ public class Person{
     }
 
     boolean isMoving() {
-        return (this.currentTask != null || this.targetItem != null) && (route != null && route.size() > 0);
+        return (route != null && route.size() > 0);
     }
     
     void addState(String stateString){
@@ -172,5 +184,9 @@ public class Person{
     
     public Set<String> getState(){
         return state;
+    }
+    
+    public int getType(){
+        return personType;
     }
 }

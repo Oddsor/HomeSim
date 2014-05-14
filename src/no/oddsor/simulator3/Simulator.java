@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import net.oddsor.AStarMulti.AStarMulti;
 import no.oddsor.simulator3.json.TaskReader;
+import no.oddsor.simulator3.tables.Node;
 
 
 public class Simulator {
@@ -23,19 +24,13 @@ public class Simulator {
      * @param map
      * @param simulationsPerSec
      */
-    public Simulator(SimulationMap map, int simulationsPerSec){
+    public Simulator(SimulationMap map, TaskManager taskmanager, int simulationsPerSec){
         this.map = map;
         this.sensorlogger = null;
         this.simsPerSec = simulationsPerSec;
         this.time = new Time(0);
         this.currentTime = 0;
-        TaskReader j = null;
-        try {
-            j = new TaskReader("tasks.json");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        this.taskManager = new TaskManager(j);
+        this.taskManager = taskmanager;
         this.recentlyTriggered = new HashMap<>();
     }
     
@@ -54,49 +49,67 @@ public class Simulator {
         {
             if(person.isMoving())
             {   //We're traveling!
-                person.setLocation(map.moveActor(person, simsPerSec));
-                movement = true;
-            }
-            else if(person.getTargetItem() != null)
-            {
-                person.progressFetch(1.0/simsPerSec);
-                if(person.getFetchTime() <= 0.0){
-                    Item fetchedItem = map.popItem(person.getTargetItem(), map.getClosestNode(person.currentLocation()));
-                    System.out.println(fetchedItem.name);
-                    if(fetchedItem != null){ 
-                        person.addItem(fetchedItem);
-                        person.setTargetItem(null);
-                    }else{
-                        System.out.println("Trouble fetching item??");
-                    }
+                if(person.getType() == 0){ 
+                    movement = true;
+                    person.setLocation(map.moveActor(person, simsPerSec));
+                }else{
+                    person.setLocation(map.moveActor(person, simsPerSec * 6));
                 }
             }
-            else if(person.getCurrentTask() != null)
+            else if(person.getType() == 0 && person.getTargetItem() != null)
+            {
+                person.progressFetch(1.0/simsPerSec);
+                Node current = map.getClosestNode(person.currentLocation());
+                if(person.getFetchTime() <= 0.0){
+                    Item fetchedItem = map.popItem(person.getTargetItem(), current);
+                    while(fetchedItem != null){ 
+                        person.addItem(fetchedItem);
+                        fetchedItem = map.popItem(fetchedItem.name, current);
+                        if(fetchedItem == null){
+                            if(map.hasItem(person.getTargetItem(), 1)){
+                                taskManager.moveForItems(person, (person.getGoalTask() != null?person.getGoalTask():(person.getCurrentTask() != null?person.getCurrentTask():null)), map);
+                            }
+                        }
+                    }person.setTargetItem(null);
+                }
+            }
+            else if(person.getType() == 0 && person.getCurrentTask() != null)
             {
                 person.progressTask(1.0/simsPerSec);
                 if(person.remainingDuration() <= 0.0){
-                    person.getCurrentTask().completeTask(person, map);
-                    person.getCurrentTask().recentlyCompleted();
+                    if(person.getCurrentTask().getType().equals("Automatic")){
+                        map.addTask(person.getCurrentTask(), map.getClosestNode(person.currentLocation()));
+                        for(String stat: person.getCurrentTask().getNeg()){
+                            person.addState("-" + stat);
+                        }for(String stat: person.getCurrentTask().getPos()){
+                            person.addState("+" + stat);
+                        }
+                        
+                    }else{
+                        person.getCurrentTask().completeTask(person, map);
+                        person.getCurrentTask().recentlyCompleted();
+                    }
                     person.setCurrentTask(null, null);
                 }
             }
             else{
-                if(Math.random() < 0.25)
+                if(Math.random() < 0.15)
                 {
                     try {
-                        System.out.println(person.name + " chooses to wander a bit.");
                         person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-                }else{
+                }else if(person.getType() == 0){
                     taskManager.findTask(person, map, currentTime);
                 }
             }
             sensorlogger.log(person, map.getSensors(), currentTime);
             person.passTime(1.0/simsPerSec);
-            taskManager.passTime(1.0/simsPerSec);
+            
         }
+        taskManager.passTime(1.0/simsPerSec);
+        map.progressTasks(1.0/simsPerSec);
         currentTime += (1.0/simsPerSec);
         return movement;
     }

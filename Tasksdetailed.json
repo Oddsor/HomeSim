@@ -7,7 +7,7 @@
 			"Duration": 1,
 			"RequiresItem": ["Laundry", 1],
 			"AddsState":["+Laundry"],
-			"Label": "Do laundry",
+			"Label": "Wash clothes",
 			"Cooldown": 2
 		},{
 			"Name": "Wash clothes",
@@ -17,7 +17,7 @@
 			"NeedsState": "Laundry",
 			"AddsState": ["-Laundry"],
 			"Creates": "WashedLaundry",
-			"Label": "Do laundry"
+			"Label": "Wash clothes"
 		},
 		{
 			"Name": "Get washed laundry",
@@ -49,7 +49,7 @@
 			"Type": "Finite",
 			"Duration": 30,
 			"Timespan": [15, 18],
-			"Appliance": "Sofa2",
+			"Appliance": "Sofa",
 			"PoseFeatures": ["Liedown"],
 			"AddsState": ["-Hairdo"],
 			"IncreasesNeed": ["Energy", 25],
@@ -69,14 +69,16 @@
 			"Duration": 1,
 			"Appliance": "Shoerack",
 			"AddsState": ["+Shoes"],
-			"PoseFeatures": ["Kneeling", "ArmsLow"]
+			"PoseFeatures": ["Kneeling", "ArmsLow"],
+			"Label": "Equip shoes"
 		},{
 			"Name": "Equip jacket",
 			"Type": "Finite",
 			"Duration": 1,
 			"Appliance": "Jacketrack",
 			"AddsState": ["+Jacket"],
-			"PoseFeatures": ["ArmsOut", "+HandlingDoor"]
+			"PoseFeatures": ["ArmsOut", "+HandlingDoor"],
+			"Label": "Equip jacket"
 		},{
 			"Name": "Remove jacket",
 			"Type": "Finite",
@@ -99,7 +101,8 @@
 			"Duration": 1,
 			"Appliance": "Closet",
 			"NeedsState": ["Undressed"],
-			"AddsState": ["-Undressed"]
+			"AddsState": ["-Undressed"],
+			"Label":"Get dressed"
 		},{
 			"Name": "Remove clothes",
 			"Type": "Finite",
@@ -116,7 +119,7 @@
 			"RequiresItem": "Ingredients",
 			"Creates": "Food",
 			"PoseFeatures": ["+Chopping"],
-			"Label": "Make food"
+			"Label": "Make dinner"
 		},
 		{
 			"Name": "Make food",
@@ -164,7 +167,7 @@
 			"Appliance": "Dishwasher",
 			"RequiresItem": "CleanPlates",
 			"AddState": ["+CleanPlates", "+CleanKnives"],
-			"Label": "Do dishes"
+			"Label": "Empty dishwasher"
 		},{
 			"Name": "Place plates",
 			"Type": "Finite",
@@ -172,7 +175,7 @@
 			"Appliance": "Cabinet",
 			"NeedsState": "CleanPlates",
 			"AddState": ["-CleanPlates"],
-			"Label": "Do dishes"
+			"Label": "Empty dishwasher"
 		},
 		{
 			"Name": "Place knives",
@@ -181,7 +184,7 @@
 			"Appliance": "Drawer",
 			"NeedsState": "CleanKnives",
 			"AddState": ["-CleanKnives"],
-			"Label": "Do dishes"
+			"Label": "Empty dishwasher"
 		},
 		{
 			"Name": "Shower",
@@ -207,7 +210,7 @@
 			"Duration": 1,
 			"Appliance": "BathSink",
 			"AddsState":["-DirtyHands"],
-			"Label": "Hygiene"
+			"Label": "Wash hands"
 		},
 		{
 			"Name": "Read book",
@@ -233,7 +236,7 @@
 			"Appliance": "Outside",
 			"NeedsState": ["Shoes", "Jacket"]
 			"Creates": "Wares",
-			"Label": "Go outside"
+			"Label": "Go to store"
 		},
 		{
 			"Name": "Get mail",
@@ -242,7 +245,7 @@
 			"Timespan": [14, 16],
 			"Appliance": "Outside",
 			"NeedsState": ["Shoes"],
-			"Label": "Go outside",
+			"Label": "Get mail",
 			"Cooldown": 2
 		},
 		{
@@ -277,7 +280,7 @@
 			"Appliance": "BathSink",
 			"AddsState": ["+Brushed"],
 			"PoseFeatures": ["+BrushingTeeth", "ArmsToFace"],
-			"Label": "Hygiene"
+			"Label": "Brush teeth"
 		},{
 			"Name": "Fix hair",
 			"Type": "Finite",
@@ -285,7 +288,7 @@
 			"Appliance": "BathSink",
 			"AddsState": ["+Hairdo"],
 			"PoseFeatures": ["+HandsonHead", "ArmsToFace"],
-			"Label": "Hygiene"
+			"Label": "Fix hair"
 		},
 		{
 			"Name": "Use PC",

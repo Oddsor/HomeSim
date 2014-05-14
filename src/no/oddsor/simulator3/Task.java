@@ -132,7 +132,7 @@ public class Task implements ITask{
 
     @Override
     public boolean available(double time) {
-        if(startTime < 0 || endTime < 0 && cooldown == 0.0) return true;
+        if((startTime < 0 || endTime < 0) && cooldown == 0.0) return true;
         int newEndTime = (endTime + (24 - startTime)) % 24;
         int offset = (Time.getHours(time) + (24 - startTime)) % 24;
         return offset < newEndTime && cooldown == 0.0;
@@ -292,8 +292,8 @@ public class Task implements ITask{
         this.cooldown = cooldownMax;
     }
 
-    public void setCooldown(double d) {
-        this.cooldownMax = d;
+    public void setCooldown(double seconds) {
+        this.cooldownMax = seconds;
     }
 
     @Override

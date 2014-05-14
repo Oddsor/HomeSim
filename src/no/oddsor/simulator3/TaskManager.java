@@ -46,7 +46,13 @@ public class TaskManager {
                     LOG.info(tusks.toString());
                     setTaskForPerson(person, tusks.getFirst(), map);
                 } catch (Exception ex) {
-                    LOG.log(Level.SEVERE, "Crashed when finding plan and setting task.", ex);
+                    ArrayList<String> mapItems = new ArrayList<>();
+                    for(Item it: map.items){
+                        mapItems.add(it.name);
+                    }
+                    LOG.log(Level.SEVERE, "Crashed when finding plan and setting task " + person.getGoalTask().name() + 
+                            ", " + person.getGoalTask().getRequiredItemsSet() + ", " + person.getInventory().keySet() + ", " +
+                            mapItems, ex);
                 }
             }
         }else{
@@ -55,12 +61,12 @@ public class TaskManager {
             List<Need> needs = new ArrayList<>(person.getNeeds());
             Collection<ITask> scheduledTasks = getScheduled(availableTasks);
             System.out.println(scheduledTasks);
-            Collection<ITask> tasksToRemoveState = getRemoverTasks(availableTasks, person.getState());
-            System.out.println(tasksToRemoveState);
+            Collection<ITask> tasksToRemoveStuff = getRemoverTasks(availableTasks, person, map);
+            System.out.println(tasksToRemoveStuff);
             if(scheduledTasks != null){
                 person.setGoalTask(scheduledTasks.iterator().next());
-            }else if(tasksToRemoveState != null){
-                person.setGoalTask(tasksToRemoveState.iterator().next());
+            }else if(tasksToRemoveStuff != null){
+                person.setGoalTask(tasksToRemoveStuff.iterator().next());
             }
             else{
                 while(!needs.isEmpty()){
@@ -143,7 +149,6 @@ public class TaskManager {
                 }
             }
         }
-        tasksForNeed = new ArrayList<>(filterAvailable(tasksForNeed, time));
         LOG.info(tasksForNeed.size() + " possible tasks to fulfill " + need.name());
         return (tasksForNeed.isEmpty()? null: tasksForNeed.get(new Random().nextInt(tasksForNeed.size())));
     }
@@ -179,12 +184,17 @@ public class TaskManager {
         else return schedules;
     }
 
-    private Collection<ITask> getRemoverTasks(Collection<ITask> availableTasks, Set<String> states) {
+    private Collection<ITask> getRemoverTasks(Collection<ITask> availableTasks, Person person, SimulationMap map) {
         Collection<ITask> removers = new ArrayList<>();
-        for(String state: states){
-            for(ITask t: availableTasks){
-                if(t.getNeg().contains(state)) removers.add(t);
+        Set<String> states = person.getState();
+        for(ITask t: availableTasks){
+            if(t.getType().equals("Cleanup") && t.itemsExist(person, map)) removers.add(t);
+            else{
+                for(String state: states){
+                    if(t.getNeg().contains(state)) removers.add(t);
+                }
             }
+
         }
         if(removers.isEmpty())return null;
         else return removers;

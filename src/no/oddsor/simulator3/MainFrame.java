@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,10 +70,10 @@ public class MainFrame extends JFrame{
             db.open();
             ArrayList<Person> people = new ArrayList<>();
             TaskReader j = new TaskReader("Tasks.json");
-            people.add(new Person("Odd", "oddsurcut.png", new Point(0, 0), j.getNeeds()));
-            //people.add(new Person("Obama", "obama-head.png", new Point(0, 0), j.getNeeds()));
-            map = new SimulationMap("appsketch.jpg", 50, 1, people, 43, db);
-            sim = new Simulator(map, 3);
+            map = new SimulationMap("appsketch.jpg", 50, 2, people, 43, db);
+            people.add(new Person("Odd", "oddsurcut.png", map.getStartingPoint(), j.getNeeds()));
+            //people.add(new Person("Obama", "obama-head.png", map.getStartingPoint(), j.getNeeds(), Person.WANDERER));
+            sim = new Simulator(map, new TaskManager(j), 3);
             painter = new SimulationDisplay("appsketch.jpg");
             designer = new DesignFrame(db);
         }catch(Exception e){

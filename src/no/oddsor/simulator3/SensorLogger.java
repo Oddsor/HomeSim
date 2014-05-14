@@ -31,6 +31,8 @@ public class SensorLogger {
     private int suffix;
     private final String fileName;
     private final Map<String, Double> lastTriggered;
+    private Set<String> lastPoses;
+    private ITask lastTask;
     
     private final double TRIGGER_INTERVAL = 5.0;
     
@@ -47,9 +49,12 @@ public class SensorLogger {
         df.setMaximumFractionDigits(6);
         counter = 0;
         lastTriggered = new HashMap<String, Double>();
+        lastPoses = null;
+        lastTask = null;
     }
     
     public void log(Person person, Collection<Sensor> sensors, double currentTime){
+        
         for(Sensor s: sensors){
             for(SensorArea sa: s.getSensorAreas()){
                 if(sa.getArea() == null && person.getUsingAppliance() != null 
@@ -58,31 +63,42 @@ public class SensorLogger {
                         (!lastTriggered.containsKey(person.getUsingAppliance().getName()) || 
                         (lastTriggered.get(person.getUsingAppliance().getName()) != null && currentTime - lastTriggered.get(person.getUsingAppliance().getName()) >= 60.0))){
                     lastTriggered.put(person.getUsingAppliance().getName(), currentTime);
-                    
-                    try {
-                        addSensor(currentTime, person.getUsingAppliance().getName(),
-                                s.getClass().getSimpleName(), "ON", person.getCurrentTask().name());
-                        sa.setLastValue("ON");
-                    } catch (IOException ex) {
-                        LOG.log(Level.SEVERE, null, ex);
+                    if(!sa.getLastValue().equals("ON")){
+                        try {
+                            addSensor(currentTime, person.getUsingAppliance().getName()+"CT",
+                                    person.getUsingAppliance().getName()+"CT", "ON", (person.getCurrentTask() != null ? 
+                                                        (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
+                                                                (person.getGoalTask() != null ? 
+                                                                        (person.getGoalTask().label() != null ? person.getGoalTask().label() : "Other_Activity")
+                                                                    : "Other_Activity"))
+                                                        : "Other_Activity"));
+                            sa.setLastValue("ON");
+                        } catch (IOException ex) {
+                            LOG.log(Level.SEVERE, null, ex);
+                        }
                     }
-                    
                 }else if(sa.getArea() != null && sa.getArea().contains(person.currentLocation())){
                     if(s instanceof Camera && !person.isMoving()){
                         Set<String> poses = person.getPoseData();
-                        for(String pose:poses){
-                            if(!lastTriggered.containsKey(sa.getName() + pose) ||
-                                    (lastTriggered.get(sa.getName() + pose) != null && 
-                                    currentTime - lastTriggered.get(sa.getName() + pose)  >= 120.0)){
-                                lastTriggered.put(sa.getName() + pose, currentTime);
-                                try{
-                                    addSensor(currentTime, sa.getName(), s.getClass().getSimpleName(), pose, 
-                                            (person.getCurrentTask() != null ? 
-                                                    (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
-                                                            (person.getGoalTask().label() != null? person.getGoalTask().label():"Other_Activity"))
-                                                    : "Other_Activity"));
-                                }catch(IOException ex){
-                                    LOG.log(Level.SEVERE, null, ex);
+                        if(lastPoses != poses && lastTask != person.getCurrentTask()){
+                            lastPoses = poses;
+                            lastTask = person.getCurrentTask();
+                            for(String pose:poses){
+                                if(!lastTriggered.containsKey(sa.getName() + pose) ||
+                                        (lastTriggered.get(sa.getName() + pose) != null && 
+                                        currentTime - lastTriggered.get(sa.getName() + pose)  >= 10.0)){
+                                    lastTriggered.put(sa.getName() + pose, currentTime);
+                                    try{
+                                        addSensor(currentTime, sa.getName(), sa.getName(), pose, 
+                                                (person.getCurrentTask() != null ? 
+                                                        (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
+                                                                (person.getGoalTask() != null ? 
+                                                                        (person.getGoalTask().label() != null ? person.getGoalTask().label() : "Other_Activity")
+                                                                    : "Other_Activity"))
+                                                        : "Other_Activity"));
+                                    }catch(IOException ex){
+                                        LOG.log(Level.SEVERE, null, ex);
+                                    }
                                 }
                             }
                         }
@@ -93,11 +109,13 @@ public class SensorLogger {
                         if(!sa.getLastValue().equals("ON")){
                             try {
                                 addSensor(currentTime, sa.getName(),
-                                        s.getClass().getSimpleName(), "ON",
+                                        sa.getName(), "ON",
                                         (person.getCurrentTask() != null ? 
-                                                        (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
-                                                                (person.getGoalTask() != null && person.getGoalTask().label() != null? person.getGoalTask().label():"Other_Activity"))
-                                                        : "Other_Activity"));
+                                                    (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
+                                                            (person.getGoalTask() != null ? 
+                                                                    (person.getGoalTask().label() != null ? person.getGoalTask().label() : "Other_Activity")
+                                                                : "Other_Activity"))
+                                                    : "Other_Activity"));
                                 sa.setLastValue("ON");
                             } catch (IOException ex) {
                                 LOG.log(Level.SEVERE, null, ex);
@@ -109,14 +127,8 @@ public class SensorLogger {
                     if(lastTriggered.containsKey(sa.getName()) && currentTime - lastTriggered.get(sa.getName()) >= TRIGGER_INTERVAL){
                         if(!sa.getLastValue().equals("OFF")){
                             try {
-                                addSensor(currentTime, sa.getName(),
-                                        s.getClass().getSimpleName(), "OFF",
-                                        (person.getCurrentTask() != null ? 
-                                                        (person.getCurrentTask().label() != null ? person.getCurrentTask().label() : 
-                                                                (person.getGoalTask() != null && person.getGoalTask().label() != null? person.getGoalTask().label():"Other_Activity"))
-                                                        : "Other_Activity"));
                                 sa.setLastValue("OFF");
-                            } catch (IOException ex) {
+                            } catch (Exception ex) {
                                 LOG.log(Level.SEVERE, null, ex);
                             }
                         }
@@ -143,7 +155,7 @@ public class SensorLogger {
                 + " " + removeSpaces(sensorValue) + " " + 
                 removeSpaces(activityName) + "\n");
         fileWriter.flush();
-        if(counter == 10000){
+        if(counter == 25000){
             counter = 0;
             suffix ++;
             fileWriter.close();

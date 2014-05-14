@@ -55,7 +55,7 @@ public class TaskReader {
                         (nextTask.containsKey("Label")? (String) nextTask.get("Label"): null)));
             }
             if(nextTask.containsKey("Cooldown")){
-                double d = (long)nextTask.get("Cooldown") * 60.0;
+                double d = (long)nextTask.get("Cooldown") * 3600.0;
                 newTask.setCooldown(d);
             }
             if(nextTask.containsKey("IncreasesNeed")){

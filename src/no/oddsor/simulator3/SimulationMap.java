@@ -1,17 +1,18 @@
 
 package no.oddsor.simulator3;
 
-import no.oddsor.simulator3.tables.Node;
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import no.oddsor.simulator3.json.SensorReader;
 import no.oddsor.simulator3.sensor.Sensor;
+import no.oddsor.simulator3.tables.Node;
 
 
 public class SimulationMap {
@@ -29,6 +30,8 @@ public class SimulationMap {
     public ArrayList<Appliance> objects;
     public Collection<Item> items;
     private Collection<Sensor> sensors;
+    private Node startNode;
+    private Collection<AutoTask> runningTasks;
 
     public Collection<Sensor> getSensors() {
         return sensors;
@@ -50,6 +53,7 @@ public class SimulationMap {
         else nodes = new ArrayList<>();
         objects = new ArrayList<>();
         for(Node node: nodes){
+            if(node.id == startNodeId) startNode = node;
             if(!node.types.isEmpty()){
                 for(Appliance obj: node.types){
                     objects.add(obj);
@@ -57,6 +61,7 @@ public class SimulationMap {
             }
         }
         this.items = new ArrayList<>();
+        this.runningTasks = new ArrayList<>();
     }
 
     public Node getClosestNode(Point start) {
@@ -158,4 +163,53 @@ public class SimulationMap {
         System.out.println(map.hasItem("Wares", 1));
         System.out.println(map.hasItem("Wares", 2));
     }
+    
+    public Point getStartingPoint(){
+        return startNode.getLocation();
+    }
+
+    void addTask(ITask currentTask, Node closestNode) {
+        this.runningTasks.add(new AutoTask(currentTask, closestNode));
+    }
+    void progressTasks(double seconds){
+        Iterator<AutoTask> it = runningTasks.iterator();
+        while(it.hasNext()){
+            AutoTask t = it.next();
+            t.progressTask(seconds);
+            if(t.getDuration() <= 0.0){
+                System.out.println(t.getTask().name() + ", " + t.getTask().getCreatedItems());
+                for(String item: t.getTask().getCreatedItems()){
+                    this.addItem(new Item(item, t.getNode()));
+                }
+                it.remove();
+                System.out.println(t.task.name() + " completed");
+            }
+        }
+    }
+
+    private static class AutoTask {
+        private final ITask task;
+        private final Node node;
+        private double duration;
+
+        AutoTask(ITask currentTask, Node closestNode) {
+            this.task = currentTask;
+            this.node = closestNode;
+            this.duration = currentTask.getDurationSeconds();
+        }
+        void progressTask(double seconds){
+            duration -= seconds;
+        }
+        double getDuration(){
+            return duration;
+        }
+        
+        ITask getTask(){
+            return task;
+        }
+        Node getNode(){
+            return node;
+        }
+    }
+    
 }
