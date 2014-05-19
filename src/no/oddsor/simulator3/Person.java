@@ -32,6 +32,7 @@ public class Person{
     
     private final HashMap<String, Integer> inventory;
     private int personType;
+    private double pauseTime;
 
     public HashMap<String, Integer> getInventory() {
         return inventory;
@@ -53,6 +54,7 @@ public class Person{
         inventory = new HashMap<>();
         state = new HashSet<>();
         personType = 0;
+        this.pauseTime = 0.0;
     }
     public Person(String name, String avatarImage, Point currentLocation, List<Need> needs, int type){
         this(name, avatarImage, currentLocation, needs);
@@ -152,6 +154,7 @@ public class Person{
         for(Need need: needs){
             need.deteriorate(seconds);
         }
+        if(pauseTime > 0.0) pauseTime -= seconds;
     }
     
     public double getFetchTime(){
@@ -188,5 +191,12 @@ public class Person{
     
     public int getType(){
         return personType;
+    }
+    
+    public void setPauseTime(double seconds){
+        this.pauseTime = seconds;
+    }
+    public double getPauseTime(){
+        return pauseTime;
     }
 }

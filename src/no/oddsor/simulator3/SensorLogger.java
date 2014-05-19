@@ -155,13 +155,13 @@ public class SensorLogger {
                 + " " + removeSpaces(sensorValue) + " " + 
                 removeSpaces(activityName) + "\n");
         fileWriter.flush();
-        if(counter == 25000){
+        /*if(counter == 25000){
             counter = 0;
             suffix ++;
             fileWriter.close();
             this.fileWriter = new BufferedWriter(
                     new FileWriter(fileName+suffix, true));
-        }counter++;
+        }counter++;*/
     }
     public String removeSpaces(String text){
         return text.replace(' ', '_');

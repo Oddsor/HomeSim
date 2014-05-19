@@ -3,12 +3,10 @@ package no.oddsor.simulator3;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,10 +27,7 @@ import javax.swing.WindowConstants;
 import no.oddsor.simulator3.json.TaskReader;
 import sun.awt.VerticalBagLayout;
 
-/**
- *
- * @author Odd
- */
+
 public class MainFrame extends JFrame{
     private SimulationDisplay painter;
     private DatabaseHandler dbHandler;
@@ -49,6 +44,7 @@ public class MainFrame extends JFrame{
     
     public HashMap<Integer, Object> options;
     private final JLabel stateList;
+    private int months;
     
     public MainFrame(){
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -69,12 +65,13 @@ public class MainFrame extends JFrame{
             db = dbHandler.getDb();
             db.open();
             ArrayList<Person> people = new ArrayList<>();
-            TaskReader j = new TaskReader("Tasks.json");
+            TaskReader j = new TaskReader("Tasksdetailed.json");
             map = new SimulationMap("appsketch.jpg", 50, 2, people, 43, db);
             people.add(new Person("Odd", "oddsurcut.png", map.getStartingPoint(), j.getNeeds()));
             //people.add(new Person("Obama", "obama-head.png", map.getStartingPoint(), j.getNeeds(), Person.WANDERER));
             sim = new Simulator(map, new TaskManager(j), 3);
             painter = new SimulationDisplay("appsketch.jpg");
+            this.months = 2;
             designer = new DesignFrame(db);
         }catch(Exception e){
             e.printStackTrace();
@@ -137,6 +134,9 @@ public class MainFrame extends JFrame{
                     tim.setDelay(slowSpeed);
                     painter.update(map.getPeople(), map.getSensors());
                     updateMenu();
+                }
+                if(Time.getWeek(sim.currentTime) == 9){
+                    tim.stop();
                 }
             }
         };

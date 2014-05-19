@@ -8,6 +8,7 @@
 			"RequiresItem": ["Laundry", 1],
 			"AddsState":["+Laundry"],
 			"Label": "Wash clothes",
+			"PoseFeatures": ["Bending", "ArmsLow", "+Pick_up"],
 			"Cooldown": 2
 		},{
 			"Name": "Wash clothes",
@@ -70,7 +71,8 @@
 			"Appliance": "Shoerack",
 			"AddsState": ["+Shoes"],
 			"PoseFeatures": ["Kneeling", "ArmsLow"],
-			"Label": "Equip shoes"
+			"Label": "Equip shoes",
+			"PoseFeatures": ["Kneeling", "ArmsLow", "+ArmsToFeet"]
 		},{
 			"Name": "Equip jacket",
 			"Type": "Finite",
@@ -109,6 +111,7 @@
 			"Duration": 1,
 			"Appliance": "ClothesBin",
 			"Creates": "Laundry",
+			"PoseFeatures": ["ArmsUp", "Bending"],
 			"AddsState": ["+Undressed"]
 		},{
 			"Name": "Make dinner",
@@ -150,6 +153,7 @@
 			"AddsState": ["+Dishes"],
 			"RequiresItem": ["DirtyDishes", 1],
 			"Label": "Do dishes",
+			"PoseFeatures": ["ArmsNinety", "+Pick_up"],
 			"Cooldown": 2
 		},{
 			"Name": "Start dishwasher",
@@ -159,6 +163,7 @@
 			"NeedsState": "Dishes",
 			"AddsState": ["-Dishes"],
 			"Creates": "CleanPlates",
+			"PoseFeatures": ["Bending", "ArmsOut"],
 			"Label": "Do dishes"
 		},{
 			"Name": "Take out plates",
@@ -210,6 +215,7 @@
 			"Duration": 1,
 			"Appliance": "BathSink",
 			"AddsState":["-DirtyHands"],
+			"PoseFeatures": ["+ArmsRubbing"],
 			"Label": "Wash hands"
 		},
 		{
