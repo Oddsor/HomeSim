@@ -27,7 +27,7 @@
 			"Appliance": "WashingMachine",
 			"RequiresItem": "WashedLaundry",
 			"AddsState": ["+WashedLaundry"],
-			"Label": "Do laundry",
+			"Label": "Do laundry"
 		},{
 			"Name": "Place laundry",
 			"Type": "Finite",
@@ -35,7 +35,7 @@
 			"Appliance": "Closet",
 			"NeedsState": "WashedLaundry",
 			"AddsState": ["-WashedLaundry"],
-			"Label": "Do laundry",
+			"Label": "Do laundry"
 		},
 		{
 			"Name": "Watch TV",
