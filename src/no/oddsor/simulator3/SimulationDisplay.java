@@ -24,7 +24,7 @@ public class SimulationDisplay extends JPanel{
     private Collection<Person> people;
 
     public SimulationDisplay(String mapName) {
-        image = new ImageIcon(getClass().getResource(mapName)).getImage();
+        image = new ImageIcon(mapName).getImage();
         Dimension size = new Dimension(image.getWidth(this), image.getHeight(this));
         setPreferredSize(size);
         people = null;

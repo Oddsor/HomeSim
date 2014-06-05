@@ -38,14 +38,11 @@ public class SimulationMap {
     }
     
     public SimulationMap(String mapName, int walkingDistancePerSec, int startId, 
-            Collection<Person> people, int dotsPerMeter, SQLiteConnection db){
+            Collection<Person> people, int dotsPerMeter, Collection<Sensor> sr, SQLiteConnection db){
         this.mapName = mapName;
         this.people = people;
-        try {
-            sensors = new SensorReader("sensors.json").getSensors();
-        } catch (Exception ex) {
-            Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.sensors = sr;
+        
         this.walkingSpeedPerSec = walkingDistancePerSec;
         this.dotsPerMeter = dotsPerMeter;
         this.startNodeId = startId;
@@ -154,18 +151,9 @@ public class SimulationMap {
         return nodePool.get(rand.nextInt(nodePool.size()));
     }
     
-    public static void main(String[] args){
-        SimulationMap map = new  SimulationMap("", 5, 1, null, 43, null);
-        map.addItem(new Item("Wares", null));
-        Task t = new Task("ye", "s", 1, null, "ye");
-        t.addRequiredItem("Wares", 1);
-        System.out.println(t.itemsExist(new Person("s", "oddsurcut.png", null, null), map));
-        System.out.println(map.hasItem("Wares", 1));
-        System.out.println(map.hasItem("Wares", 2));
-    }
     
     public Point getStartingPoint(){
-        return startNode.getLocation();
+        return (startNode == null? new Point(0,0):startNode.getLocation());
     }
 
     void addTask(ITask currentTask, Node closestNode) {

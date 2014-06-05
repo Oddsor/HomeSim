@@ -51,7 +51,7 @@ public class NodePainter extends JPanel implements MouseListener, MouseMotionLis
     {
         this.simFrame = frame;
         this.db = db;
-        image = new ImageIcon(getClass().getResource(imgFile)).getImage();
+        image = new ImageIcon(imgFile).getImage();
         setPreferredSize(new Dimension(image.getWidth(this), image.getHeight(this)));
         
         setBounds(0, 0, image.getWidth(this), image.getHeight(this));

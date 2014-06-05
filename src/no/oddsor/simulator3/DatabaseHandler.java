@@ -16,24 +16,16 @@ import java.util.logging.Logger;
  */
 public class DatabaseHandler {
     
-    private static final String standardName = "database.sqlite";
-    private String filename;
-    
-    public DatabaseHandler(String filename) throws IOException{
-        new File(filename).mkdirs();
-        new File(filename).createNewFile();
-        this.filename = filename;
+    String folder;
+    public DatabaseHandler(String folder) throws IOException{
+        this.folder = folder;
+        //new File(folder + "/database.sqlite").mkdirs();
+        new File(folder + "/database.sqlite").createNewFile();
         createTables();
     }
     
     public SQLiteConnection getDb(){
-        return new SQLiteConnection(new File(filename));
-    }
-    
-    public DatabaseHandler() throws IOException{
-        new File(standardName).createNewFile();
-        this.filename = standardName;
-        createTables();
+        return new SQLiteConnection(new File(folder + "/database.sqlite"));
     }
     
     private void createTables(){

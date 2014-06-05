@@ -36,10 +36,10 @@ public class DesignFrame extends JFrame implements ActionListener{
     private JComboBox chooser;
     private JList lister;
     
-    public DesignFrame(SQLiteConnection db){
+    public DesignFrame(String folder, SQLiteConnection db){
         setTitle("Editor");
         try{
-            painter = new NodePainter(this, "appsketch.jpg", db);
+            painter = new NodePainter(this, folder + "/environment.jpg", db);
         }catch(Exception e){
             e.printStackTrace();
         }

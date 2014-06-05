@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,7 +27,9 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
+import no.oddsor.simulator3.json.SensorReader;
 import no.oddsor.simulator3.json.TaskReader;
+import no.oddsor.simulator3.sensor.Sensor;
 import sun.awt.VerticalBagLayout;
 
 
@@ -37,6 +42,7 @@ public class MainFrame extends JFrame{
     Timer tim;
     Simulator sim;
     SimulationMap map;
+    long startTime;
     
     private HashMap<String, JProgressBar> needBars;
     
@@ -45,8 +51,9 @@ public class MainFrame extends JFrame{
     public HashMap<Integer, Object> options;
     private final JLabel stateList;
     private int months;
+    private String folder;
     
-    public MainFrame(){
+    public MainFrame(String folder){
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("PersonSimulator");
         
@@ -59,20 +66,21 @@ public class MainFrame extends JFrame{
         });
 
         sim = null;
+        this.folder = folder;
         needBars = new HashMap<>();
         try{
-            dbHandler = new DatabaseHandler();
+            dbHandler = new DatabaseHandler(folder);
             db = dbHandler.getDb();
             db.open();
             ArrayList<Person> people = new ArrayList<>();
             TaskReader j = new TaskReader("Tasksdetailed.json");
-            map = new SimulationMap("appsketch.jpg", 50, 2, people, 43, db);
+            Collection<Sensor> sr = new SensorReader(folder + "/sensors.json").getSensors();
+            map = new SimulationMap(folder + "/environment.jpg", 50, 2, people, 43, sr, db);
             people.add(new Person("Odd", "oddsurcut.png", map.getStartingPoint(), j.getNeeds()));
-            //people.add(new Person("Obama", "obama-head.png", map.getStartingPoint(), j.getNeeds(), Person.WANDERER));
             sim = new Simulator(map, new TaskManager(j), 3);
-            painter = new SimulationDisplay("appsketch.jpg");
+            painter = new SimulationDisplay(folder + "/environment.jpg");
             this.months = 2;
-            designer = new DesignFrame(db);
+            designer = new DesignFrame(folder, db);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -102,7 +110,7 @@ public class MainFrame extends JFrame{
             }
         }
         menubox.add(allNeeds);
-        timeLabel = new JLabel("Tim");
+        timeLabel = new JLabel("Time");
         menubox.add(timeLabel);
         menubox.add(new JPanel());
         
@@ -135,8 +143,9 @@ public class MainFrame extends JFrame{
                     painter.update(map.getPeople(), map.getSensors());
                     updateMenu();
                 }
-                if(Time.getWeek(sim.currentTime) == 9){
+                if(Time.getWeek(sim.currentTime) == months*2 + 1){
                     tim.stop();
+                    System.out.println("Elapsed time in milliseconds: " + (System.currentTimeMillis() - startTime));
                 }
             }
         };
@@ -152,6 +161,7 @@ public class MainFrame extends JFrame{
                     ex.printStackTrace();
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                startTime = System.currentTimeMillis();
                 tim.start();
             }
         });
@@ -184,7 +194,8 @@ public class MainFrame extends JFrame{
     public static void main(String[] args){
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainFrame().setVisible(true);
+                
+                new MainFrame("home2").setVisible(true);
             }
         });
     }

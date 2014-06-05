@@ -1,13 +1,11 @@
 
 package no.oddsor.simulator3;
 
-import java.awt.Event;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oddsor.AStarMulti.AStarMulti;
-import no.oddsor.simulator3.json.TaskReader;
 import no.oddsor.simulator3.tables.Node;
 
 

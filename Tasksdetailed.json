@@ -319,17 +319,5 @@
 			"Appliance": "Drawer",
 			"Creates": "Utensils"
 		}
-	],
-	"People":[
-		{
-			"Name": "Odd",
-			"Image": "oddsurcut.png",
-			"Owns": 0
-		},
-		{
-			"Name": "Obama",
-			"Image": "obama-head.png",
-			"Owns": 1
-		}
 	]
 }
