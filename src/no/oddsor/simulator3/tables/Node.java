@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import net.oddsor.AStarMulti.AStarNode;
 import no.oddsor.simulator3.Appliance;
@@ -121,9 +122,11 @@ public class Node extends AbstractTable implements AStarNode{
     }
     
     public void removeObject(String type){
-        for(Appliance obj: types){
+        Iterator<Appliance> it = types.iterator();
+        while(it.hasNext()){
+            Appliance obj = it.next();
             if(obj.type.equals(type)){
-                types.remove(obj);
+                it.remove();
                 update();
             }
         }

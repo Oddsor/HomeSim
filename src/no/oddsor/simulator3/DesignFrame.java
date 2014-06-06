@@ -2,6 +2,7 @@
 package no.oddsor.simulator3;
 
 import com.almworks.sqlite4java.SQLiteConnection;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -17,7 +18,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import no.oddsor.simulator3.json.TaskReader;
 import no.oddsor.simulator3.tables.Node;
 
@@ -35,6 +40,7 @@ public class DesignFrame extends JFrame implements ActionListener{
     
     private JComboBox chooser;
     private JList lister;
+    private Box posepanel;
     
     public DesignFrame(String folder, SQLiteConnection db){
         setTitle("Editor");
@@ -50,8 +56,14 @@ public class DesignFrame extends JFrame implements ActionListener{
         
         mouseLocation = new JLabel("");
         nodePanel = new JPanel();
-        
+        nodePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         menuBox.add(nodePanel);
+        JLabel t1 = new JLabel("Right-click: Add node\n");
+        menuBox.add(t1);
+        menuBox.add(new JLabel("Left-click: Select node"));
+        menuBox.add(new JLabel("CTRL+Left-click: Link nodes"));
+        menuBox.add(new JLabel("Shift+drag: Move node"));
+        menuBox.add(new JSeparator());
         menuBox.add(mouseLocation);
         menuBox.setPreferredSize(new Dimension(200, 300));
         
@@ -91,6 +103,7 @@ public class DesignFrame extends JFrame implements ActionListener{
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+                repaint();
             }
         });
         buttens.add(adder);
@@ -105,6 +118,7 @@ public class DesignFrame extends JFrame implements ActionListener{
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+                repaint();
             }
         });
         buttens.add(remover);
@@ -123,6 +137,33 @@ public class DesignFrame extends JFrame implements ActionListener{
         lister = new JList(nodeObjects);
         lister.setVisibleRowCount(5);
         pan.add(lister);
+        posepanel = Box.createVerticalBox();
+        pan.add(posepanel);
+        lister.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                if(!lse.getValueIsAdjusting()){
+                    String selected = lister.getSelectedValue().toString();
+                    JTextField poses = new JTextField(10);
+                    for(Appliance app: selectedNode.types){
+                        if(app.type.equals(selected)){
+                            StringBuffer sb = new StringBuffer();
+                            for(String pose: app.getPoses()){
+                                sb.append(pose).append(" ");
+                            }
+                            poses.setText(sb.toString());
+                            JButton update = new JButton("Update");
+                            posepanel.removeAll();
+                            posepanel.add(poses);
+                            posepanel.add(update);
+                            pack();
+                            
+                        }
+                    }
+                }
+            }
+        });
         nodePanel.add(pan);
         pack();
     }
