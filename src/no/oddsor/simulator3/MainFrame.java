@@ -195,7 +195,7 @@ public class MainFrame extends JFrame{
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 
-                new MainFrame("home2").setVisible(true);
+                new MainFrame("home1").setVisible(true);
             }
         });
     }
