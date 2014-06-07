@@ -25,9 +25,6 @@ public class EnvironmentLauncher extends javax.swing.JFrame {
         Path currentRelative = Paths.get("");
         File directory = new File(currentRelative.toFile().getAbsolutePath());
         File[] filelist = directory.listFiles();
-        for(File l: filelist){
-            System.out.print(l.getName());
-        }
         ArrayList<String> items = new ArrayList<>();
         for(int i = 0; i < filelist.length; i++){
             File file = filelist[i];

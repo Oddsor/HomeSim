@@ -26,16 +26,21 @@ import org.json.simple.parser.JSONParser;
  */
 public class TaskReader {
     
-    public final JSONObject object;
+    public JSONObject object;
     
-    public TaskReader(String filename) throws Exception{
+    public TaskReader(String folder) throws Exception{
         JSONParser jp = new JSONParser();
-        this.object = (JSONObject)jp.parse(new FileReader(filename));
+        try{
+            this.object = (JSONObject)jp.parse(new FileReader(folder + "/activities.json"));
+        }catch(Exception e){
+            this.object = null;
+        }
     }
     
     public Collection<ITask> getTasks(){
         Collection<ITask> tasks = new  ArrayList<>();
-        JSONArray tasklist = (JSONArray) object.get("Tasks");
+        if(object == null ) return tasks;
+        JSONArray tasklist = (JSONArray) object.get("Activities");
         Iterator taskIterator = tasklist.iterator();
         while(taskIterator.hasNext()){
             JSONObject nextTask = (JSONObject) taskIterator.next();
@@ -114,7 +119,8 @@ public class TaskReader {
     
     public Set<String> getAppliances(){
         Set<String> appliances = new HashSet<>();
-        JSONArray tasklist = (JSONArray) object.get("Tasks");
+        if(object == null) return appliances;
+        JSONArray tasklist = (JSONArray) object.get("Activities");
         Iterator tasks = tasklist.iterator();
         while(tasks.hasNext()){
             JSONObject task = (JSONObject) tasks.next();
@@ -129,7 +135,8 @@ public class TaskReader {
     
     public List<Need> getNeeds(){
         List<Need> needs = new ArrayList<>();
-        JSONArray taskList = (JSONArray) object.get("Tasks");
+        if(object == null) return needs;
+        JSONArray taskList = (JSONArray) object.get("Activities");
         Set<String> needNames = new HashSet<>();
         Iterator tasks = taskList.iterator();
         while(tasks.hasNext()){
@@ -157,14 +164,4 @@ public class TaskReader {
         return people;
     }
     
-    public static void main(String[] args){
-        try {
-            TaskReader j = new TaskReader("tasks.json");
-            System.out.println(j.object.toJSONString());
-            System.out.println(j.getAppliances().toString());
-            System.out.println(j.getPeople().iterator().next().name);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 }

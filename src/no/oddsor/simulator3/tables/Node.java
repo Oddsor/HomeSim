@@ -72,6 +72,17 @@ public class Node extends AbstractTable implements AStarNode{
         }
     }
     
+    public void updatePoses(Appliance app, String poseString){
+        try{
+            db.exec("UPDATE node_objects SET poses='" + poseString + "' WHERE nodeid=" + id + " AND type ='" + app.type() + "'");
+            app.setPoses(poseString);
+        }catch(Exception e){
+            System.out.println("Failed to update poses?");
+            e.printStackTrace();
+            
+        }
+    }
+    
     public static ArrayList<Node> getNodes(SQLiteConnection db) {
         ArrayList<Node> nodes = new ArrayList<>();
         try{
@@ -109,7 +120,7 @@ public class Node extends AbstractTable implements AStarNode{
             db.exec("CREATE TABLE IF NOT EXISTS node (" +
 "room INT, id INTEGER PRIMARY KEY, x INT, y INT);");
             db.exec("CREATE TABLE IF NOT EXISTS node_objects (id INTEGER PRIMARY KEY, " + 
-                    "nodeid INTEGER, type VARCHAR(45), poses VARCHAR(200));");
+                    "nodeid INTEGER, type VARCHAR(45), poses VARCHAR(1000));");
         }catch(Exception e){
             e.printStackTrace();
         }

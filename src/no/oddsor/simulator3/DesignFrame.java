@@ -3,6 +3,7 @@ package no.oddsor.simulator3;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -10,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -34,6 +36,7 @@ public class DesignFrame extends JFrame implements ActionListener{
     private NodePainter painter;
     private JLabel mouseLocation;
     private JPanel nodePanel;
+    private String folder;
     
     private JCheckBox isStart;
     private Node selectedNode;
@@ -44,6 +47,7 @@ public class DesignFrame extends JFrame implements ActionListener{
     
     public DesignFrame(String folder, SQLiteConnection db){
         setTitle("Editor");
+        this.folder = folder;
         try{
             painter = new NodePainter(this, folder + "/environment.jpg", db);
         }catch(Exception e){
@@ -65,7 +69,7 @@ public class DesignFrame extends JFrame implements ActionListener{
         menuBox.add(new JLabel("Shift+drag: Move node"));
         menuBox.add(new JSeparator());
         menuBox.add(mouseLocation);
-        menuBox.setPreferredSize(new Dimension(200, 300));
+        menuBox.setPreferredSize(new Dimension(250, 300));
         
         horizontal.add(menuBox);
         horizontal.add(painter);
@@ -87,7 +91,7 @@ public class DesignFrame extends JFrame implements ActionListener{
         }
         selectedNode = selectedPoint;
         pan.add(isStart);
-        TaskReader json = new TaskReader("Tasks.json");
+        TaskReader json = new TaskReader(folder);
         Set<String> objectList = json.getAppliances();
         chooser = new JComboBox(objectList.toArray());
         pan.add(chooser);
@@ -145,8 +149,8 @@ public class DesignFrame extends JFrame implements ActionListener{
             public void valueChanged(ListSelectionEvent lse) {
                 if(!lse.getValueIsAdjusting()){
                     String selected = lister.getSelectedValue().toString();
-                    JTextField poses = new JTextField(10);
-                    for(Appliance app: selectedNode.types){
+                    final JTextField poses = new JTextField(7);
+                    for(final Appliance app: selectedNode.types){
                         if(app.type.equals(selected)){
                             StringBuffer sb = new StringBuffer();
                             for(String pose: app.getPoses()){
@@ -154,7 +158,17 @@ public class DesignFrame extends JFrame implements ActionListener{
                             }
                             poses.setText(sb.toString());
                             JButton update = new JButton("Update");
+                            
+                            update.setPreferredSize(new Dimension(70, 30));
+                            update.setAction(new AbstractAction("Update"){
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent ae) {
+                                    selectedNode.updatePoses(app, poses.getText());
+                                }
+                            });
                             posepanel.removeAll();
+                            posepanel.add(new JLabel("Poses(space separated)"));
                             posepanel.add(poses);
                             posepanel.add(update);
                             pack();

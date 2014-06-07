@@ -99,7 +99,7 @@ public class Simulator {
                     try {
                         person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        Logger.getLogger(Simulator.class.getName()).warning("No route found");
                     }
                 }else if(person.getType() == 0){
                     taskManager.findTask(person, map, currentTime);

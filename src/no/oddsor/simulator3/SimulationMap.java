@@ -144,6 +144,7 @@ public class SimulationMap {
     
     public Node getRandomNode(){
         List<Node> nodePool = new ArrayList<>(nodes);
+        if(nodePool.isEmpty()) return null;
         for(Appliance app: objects){
             nodePool.remove(app.location);
         }

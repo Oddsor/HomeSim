@@ -1,6 +1,7 @@
 
 package no.oddsor.simulator3;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,7 +57,11 @@ public class Appliance{
         return type+getLocation().id;
     }
 
-    Set<String> getPoses() {
+    public Set<String> getPoses() {
         return poses;
+    }
+    
+    public void setPoses(String poseString){
+        this.poses = new HashSet<String>(Arrays.asList(poseString.split(" ")));
     }
 }
