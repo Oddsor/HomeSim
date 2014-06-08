@@ -132,7 +132,8 @@ public class TaskManager {
                 }
                 if(closestNode.equals(person.getRoute().getLast())) person.setRoute(null);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.severe("Error while setting task. Route not found! Maybe " + task.getUsedAppliances().toString() + " does not exist or route is impossible?");
+                person.setPauseTime(7200);
             }
         }
     }

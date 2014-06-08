@@ -3,7 +3,6 @@ package no.oddsor.simulator3;
 
 import com.almworks.sqlite4java.SQLiteConnection;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -67,6 +66,10 @@ public class DesignFrame extends JFrame implements ActionListener{
         menuBox.add(new JLabel("Left-click: Select node"));
         menuBox.add(new JLabel("CTRL+Left-click: Link nodes"));
         menuBox.add(new JLabel("Shift+drag: Move node"));
+        menuBox.add(new JLabel("Delete: remove selected node"));
+        menuBox.add(new JSeparator());
+        menuBox.add(new JLabel("NB! restart simulator for"));
+        menuBox.add(new JLabel("changes to take effect!"));
         menuBox.add(new JSeparator());
         menuBox.add(mouseLocation);
         menuBox.setPreferredSize(new Dimension(250, 300));

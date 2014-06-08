@@ -48,6 +48,10 @@ public class Simulator {
         boolean movement = false;
         for(Person person: map.getPeople())
         {
+            if(person.getPauseTime() > 0.0){
+                person.passTime(1.0/simsPerSec);
+                continue;
+            }
             if(person.isMoving())
             {   //We're traveling!
                 if(person.getType() == 0){ 
@@ -103,15 +107,6 @@ public class Simulator {
                     }
                 }else if(person.getType() == 0){
                     taskManager.findTask(person, map, currentTime);
-                }
-                else if(person.getPauseTime() <= 0.0){
-                    try {
-                        person.setRoute(AStarMulti.getRoute(map.getRandomNode(), map.getClosestNode(person.currentLocation())));
-                        person.setPauseTime(3600.0);
-                    } catch (Exception ex) {
-                        Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
                 }
             }
             sensorlogger.log(person, map.getSensors(), currentTime);
